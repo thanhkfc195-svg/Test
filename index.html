@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <meta name="theme-color" content="#000f00">
+
+  <title>Jerry Mod TOOL Pro - VIP</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+
+    :root {
+
+      --bg: #07070d;
+
+      --bg2: #000000;
+
+      --bg3: #0e0e17;
+
+      --bg4: #141424;
+
+      --bg5: #1a1a2e;
+
+      --border: rgba(0, 232, 122, 0.15);
+
+      --border2: rgba(0, 232, 122, 0.3);
+
+      --border3: rgba(0, 232, 122, 0.5);
+
+      --text: #e8e8f0;
+
+      --text2: #6b6b88;
+
+      --text3: #4a4a60;
+
+      --red: #ff3355;
+
+      --green: #00e87a;
+
+      --blue: #3b82f6;
+
+      --cyan: #00f0ff;
+
+      --magenta: #ff00ff;
+
+      --purple: #bf55ec;
+
+      --amber: #ffaa00;
+
+      --gold: #FFD700;
+
+      --primary: #00e87a;
+
+      --secondary: #bf55ec;
+
+      --radius-sm: 8px;
+
+      --radius-md: 14px;
+
+      --radius-lg: 20px;
+
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+      --glow-green: 0 0 20px rgba(0, 232, 122, 0.25);
+
+    }
+
+
+
+    * {
+
+      box-sizing: border-box;
+
+      margin: 0;
+
+      padding: 0;
+
+      font-family: var(--font);
+
+      user-select: none;
+
+      -webkit-user-select: none;
+
+      outline: none;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+
+
+    body {
+
+      background-color: var(--bg);
+
+      color: var(--text);
+
+      overflow-x: hidden;
+
+      padding-bottom: 40px;
+
+      max-width: 480px;
+
+      margin: 0 auto;
+
+      position: relative;
+
+    }
+
+
+
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+
+
+    @keyframes pulseDot { 0%, 100% { box-shadow: 0 0 6px var(--green); } 50% { box-shadow: 0 0 14px var(--green), 0 0 4px var(--green); } }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes redGlowPulse {
+
+      0%, 100% { box-shadow: 0 0 14px rgba(0, 232, 122, 0.4), 0 0 28px rgba(0, 232, 122, 0.15); border-bottom-color: rgba(0, 232, 122, 0.5); }
+
+      50% { box-shadow: 0 0 28px rgba(0, 232, 122, 0.6), 0 0 50px rgba(0, 232, 122, 0.8); border-bottom-color: rgba(0, 232, 122, 0.8); }
+
+    }
+
+
+
+    /* HEADER STYLE */
+
+    .header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      padding: 10px 14px;
+
+      background: linear-gradient(135deg, rgba(7, 7, 13, 0.99), rgba(0, 0, 0, 0.98));
+
+      border-bottom: 2px solid var(--green);
+
+      border-radius: 0 0 22px 22px;
+
+      backdrop-filter: blur(28px);
+
+      -webkit-backdrop-filter: blur(28px);
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 100;
+
+      animation: redGlowPulse 2.5s ease-in-out infinite;
+
+    }
+
+    
+
+    .header-left { display: flex; flex-direction: row; align-items: center; gap: 10px; position: relative; z-index: 1; }
+
+    .header-left-text { display: flex; flex-direction: column; gap: 2px; }
+
+    .header-title { font-size: 18px; font-weight: 900; letter-spacing: 0.5px; color: var(--text); line-height: 1; }
+
+    .header-title span { color: var(--green); text-shadow: 0 0 12px rgba(0,232,122,0.7); }
+
+    .header-status { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text2); }
+
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+    .status-dot.on { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulseDot 2s infinite; }
+
+    .header-right { display: flex; align-items: center; gap: 6px; position: relative; z-index: 1; }
+
+    
+
+    .hdr-btn {
+
+      width: 36px; height: 36px; border-radius: 14px; background: var(--bg3); border: 1px solid var(--border);
+
+      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; color: var(--text2); transition: all 0.25s; position: relative;
+
+    }
+
+    .hdr-btn:hover { background: var(--bg4); border-color: var(--border2); color: var(--text); transform: scale(1.05); }
+
+    .hdr-btn .badge-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--green); border: 2px solid var(--bg); display: none; }
+
+    
+
+    .key-badge {
+
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 10px; font-size: 10px; font-weight: 700;
+
+      background: rgba(0, 232, 122, 0.08); border: 1px solid var(--green); color: var(--green); box-shadow: 0 0 10px rgba(0, 232, 122, 0.1); text-transform: uppercase; letter-spacing: 0.5px;
+
+    }
+
+
+
+    /* CONFIG SELECTOR BUTTONS (2 LỚP - MÀU) */
+
+    .config-selector-wrapper {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 10px;
+
+      margin: 14px 0;
+
+    }
+
+    .config-btn {
+
+      background: var(--bg3);
+
+      border: 1px solid var(--border);
+
+      color: var(--text2);
+
+      padding: 12px;
+
+      border-radius: var(--radius-md);
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      text-align: center;
+
+      cursor: pointer;
+
+      transition: all 0.25s ease;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+    .config-btn i { font-size: 16px; }
+
+    .config-btn.active {
+
+      background: rgba(0, 232, 122, 0.1);
+
+      border-color: var(--green);
+
+      color: var(--green);
+
+      box-shadow: 0 0 15px rgba(0, 232, 122, 0.2);
+
+    }
+
+
+
+    /* CARD & SECTIONS */
+
+    .card {
+
+      background: var(--bg2);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius-lg);
+
+      padding: 18px;
+
+      margin-bottom: 16px;
+
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+    }
+
+
+
+    h2 { 
+
+      font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--secondary); margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; 
+
+    }
+
+    .hint { color: var(--text2); font-size: 11px; }
+
+
+
+    /* DROP ZONE */
+
+    #drop {
+
+      border: 2px dashed var(--border2); border-radius: var(--radius-md); padding: 20px 16px; text-align: center; cursor: pointer; background: var(--bg3); margin-bottom: 12px; transition: all 0.2s;
+
+    }
+
+    #drop.hover { border-color: var(--green); background: var(--bg4); }
+
+    #drop b { color: var(--text); font-size: 13px; }
+
+    #file { display: none; }
+
+
+
+    /* TOOLBAR & BUTTONS */
+
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+
+    button {
+
+      background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all .15s ease;
+
+    }
+
+    button:hover:not(:disabled) { background: var(--bg4); border-color: var(--border2); }
+
+    button:disabled { opacity: .3; cursor: not-allowed; }
+
+    button.primary { 
+
+      background: var(--green); color: #000000; border-color: var(--green); font-weight: 800; box-shadow: var(--glow-green);
+
+    }
+
+    button.primary:hover:not(:disabled) { background: #00ff88; box-shadow: 0 0 20px rgba(0,232,122,0.5); }
+
+
+
+    /* TEXTAREAS & INPUTS */
+
+    textarea {
+
+      background: #06090e; color: #34d399; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; font-family: "Consolas", monospace; font-size: 11px; width: 100%; height: 90px; resize: vertical; margin-top: 6px;
+
+    }
+
+    textarea:focus { outline: none; border-color: var(--green); }
+
+
+
+    input[type="text"] {
+
+      background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font: 12px "Consolas", monospace; width: 100%;
+
+    }
+
+    input[type="text"]:focus { outline: none; border-color: var(--green); }
+
+    input[type="color"] { width: 45px; height: 34px; padding: 0; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+
+
+
+    /* COLOR MASK CARDS */
+
+    .card-mask {
+
+      background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 10px;
+
+    }
+
+    .card-mask header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+
+    .card-mask header .title { font-weight: 700; color: var(--cyan); font-size: 12px; }
+
+    .mask-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+
+    .swatch { width: 45px; height: 34px; border-radius: var(--radius-sm); border: 1px solid var(--border); position: relative; overflow: hidden; background: #2c3540; }
+
+    .swatch::after { content: ""; position: absolute; inset: 0; background: var(--c, transparent); }
+
+
+
+    /* STATUS BAR */
+
+    .status { margin-top: 10px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; display: block; }
+
+    .status.ok  { background: rgba(0,232,122,0.1); border: 1px solid var(--green); color: #00e87a; }
+
+    .status.err { background: rgba(255,51,85,0.1); border: 1px solid var(--red); color: #ff3355; }
+
+
+
+    /* OUTPUT HEX BLOCK */
+
+    .output-hex-container { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-top: 14px; }
+
+    .hex-scroll-box {
+
+      background: #06090e; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; font-family: "Consolas", monospace; font-size: 11px; color: #34d399; word-break: break-all; max-height: 120px; overflow-y: auto; white-space: pre-wrap; cursor: pointer; margin-top: 6px;
+
+    }
+
+    .hex-scroll-box:hover { background: #0c1017; }
+
+    .copy-tip { font-size: 10px; color: var(--text2); margin-top: 4px; text-align: right; font-style: italic; }
+
+
+
+    /* MAIN PADDING & NAV */
+
+    .main { padding: 12px 14px 110px; max-width: 480px; margin: 0 auto; }
+
+    .tab-content { display: none; }
+
+    .tab-content.active { display: block; animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+
+
+    .footer-nav {
+
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; padding: 8px 12px 16px; display: flex; align-items: center; justify-content: space-around; background: linear-gradient(to top, rgba(7, 7, 13, 0.99), rgba(0, 0, 0, 0.96)); border-top: 1px solid var(--border); z-index: 90; backdrop-filter: blur(20px);
+
+    }
+
+    .nav-btn { flex: 1; background: none; border: none; padding: 6px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 14px; color: var(--text3); transition: all 0.25s; }
+
+    .nav-btn.active { color: var(--green); }
+
+    .nav-icon { font-size: 16px; line-height: 1; }
+
+    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; }
+
+
+
+    .outer-telegram-link { width: 100%; background: #000000; border: 1px solid var(--border); color: #ffffff; padding: 12px; font-size: 12px; font-weight: 700; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+
+
+
+    .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 700; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+
+    .overlay.show { opacity: 1; pointer-events: all; }
+
+    .sheet { background: #000000; border-top: 2px solid var(--green); border-radius: 24px 24px 0 0; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 16px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    .overlay.show .sheet { transform: translateY(0); }
+
+    .sheet-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 13px; font-weight: 700; color: var(--green); }
+
+    .sheet-close { width: 28px; height: 28px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
+
+    .footer { margin-top: 30px; color: var(--text3); font-size: 10px; text-align: center; border-top: 1px solid var(--border); padding-top: 12px; }
+
+  </style>
+
+</head>
+
+
+
+<body>
+
+
+
+  <!-- HEADER GIAO DIỆN CHÍNH -->
+
+  <div class="header">
+
+    <div class="header-left">
+
+      <div class="header-left-text">
+
+        <div class="header-title">Jerry<span>Mod</span></div>
+
+        <div class="header-status">
+
+          <span class="status-dot on" id="statusDot"></span>
+
+          <span id="statusText">Đã mở khóa tự do</span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="header-right">
+
+      <div class="key-badge" id="keyBadge">
+
+        <i class="fa-solid fa-unlock"></i> <span>BYPASS</span>
+
+      </div>
+
+      <div class="hdr-btn" onclick="openNotifSheet()">
+
+        <i class="fa-solid fa-bell"></i>
+
+        <span class="badge-dot" id="notifDot" style="display:inline-block;"></span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- NỘI DUNG CHÍNH -->
+
+  <div class="main">
+
+
+
+    <div class="tab-content active" id="tab-home">
+
+      
+
+      <!-- Khối ẩn nạp cấu trúc màu mặc định -->
+
+      <div class="card" style="display: none;">
+
+        <textarea id="txtCustomColorInput"></textarea>
+
+        <button id="btnLoadCustomColor">⚡ Nạp Mã</button>
+
+      </div>
+
+
+
+      <!-- 2 NÚT CHỨC NĂNG CHỌN CẤU HÌNH (2 LỚP - MÀU) -->
+
+      <div class="config-selector-wrapper">
+
+        <button class="config-btn active" id="btnConfig1" onclick="switchConfig(1)">
+
+          <i class="fa-solid fa-layer-group"></i>
+
+          <span>Cấu hình Lớp 1</span>
+
+        </button>
+
+        <button class="config-btn" id="btnConfig2" onclick="switchConfig(2)">
+
+          <i class="fa-solid fa-palette"></i>
+
+          <span>Cấu hình Lớp 2</span>
+
+        </button>
+
+      </div>
+
+
+
+      <h2>CHỌN MÀU ĐÚNG YÊU CẦU CỦA BẠN</h2>
+
+      <div class="toolbar" style="margin-bottom: 10px;">
+
+        <button id="btnReset">↺ Reset Màu Gốc</button>
+
+        <span class="hint">Hệ thống nạp phoi cấu trúc màu tự động</span>
+
+      </div>
+
+
+
+      <section id="secMask">
+
+        <div id="masks"></div>
+
+      </section>
+
+
+
+      <!-- KHUNG HIỂN THỊ CHUỖI HEX GỐC ĐÃ ĐƯỢC PHỤC HỒI -->
+
+      <section id="secOutputHex">
+
+        <div class="output-hex-container">
+
+          <span class="hint">Bấm vào khung dưới để copy chuỗi HEX đã chỉnh màu:</span>
+
+          <div id="hexOutputBox" class="hex-scroll-box" onclick="copyFullHex()"></div>
+
+          <div id="copyTip" class="copy-tip">💡 Click vào mã trên để COPY TẤT CẢ</div>
+
+        </div>
+
+      </section>
+
+
+
+      <h2>CHẠY TOOL THAY ĐỔI MÀU</h2>
+
+      <div id="drop" tabindex="0">
+
+        <div><b>CHỌN FILE GỐC CẦN MAKE</b> TOOL MAKE FILE TỰ ĐỘNG</div>
+
+        <div id="fileDropInfo" class="hint" style="margin-top:4px; color: var(--green);">Chưa nạp file gốc</div>
+
+      </div>
+
+      <input id="file" type="file" accept=".dat,application/octet-stream">
+
+
+
+      <div class="card">
+
+        <div style="margin-bottom: 8px;">
+
+          <span class="hint" style="color: var(--green); font-weight: 700;">🔒 Bảo mật ngầm: Khóa tìm kiếm Xray Hex đã ẩn.</span>
+
+          <textarea id="txtFindHex" style="display: none;"></textarea>
+
+        </div>
+
+        <div>
+
+          <span class="hint">Dán mã HEX THAY THẾ (hoặc tự nhập tùy ý) :</span>
+
+          <textarea id="txtReplaceHex" placeholder="Dán chuỗi HEX kết quả vào đây..."></textarea>
+
+        </div>
+
+        <div class="toolbar" style="margin-top: 12px;">
+
+          <button id="btnExecutePatch" class="primary" style="width: 100%; padding: 12px;">🚀 Chạy Quét & Ghi Đè File</button>
+
+        </div>
+
+      </div>
+
+
+
+      <div id="status" class="status ok">Hệ thống đang sẵn sàng...</div>
+
+
+
+      <div class="toolbar" style="margin-top: 14px; justify-content: center;">
+
+        <button id="btnSave" class="primary" style="font-size: 13px; padding: 12px 24px; width: 100%;" disabled>💾 TẢI FILE THÀNH PHẨM _JerryMod</button>
+
+      </div>
+
+
+
+      <div class="footer">
+
+        Bản quyền giao diện &amp; tính năng thuộc về JERRY MOD © 2026.
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <!-- TAB INFO: THÔNG TIN RAM & LIÊN HỆ -->
+
+    <div class="tab-content" id="tab-info">
+
+      <div class="card" style="background:var(--bg3); border:1px solid var(--border);">
+
+        <div class="card-title" style="color:var(--green); font-size:12px; font-weight:700; margin-bottom:10px;"><i class="fa-solid fa-server"></i> TRẠNG THÁI HỆ THỐNG LIVE</div>
+
+        <div style="font-size: 13px; margin-bottom: 8px;">Dung lượng RAM: <b style="color:var(--green);" id="ramLiveText">1,240 MB</b></div>
+
+        <div style="font-size: 11px; color: var(--text2);">Bản quyền phần mềm thuộc về JERRY MOD © 2026.</div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title" style="color:var(--green); font-size:12px; font-weight:700; margin-bottom:10px;"><i class="fa-solid fa-address-book"></i> Liên hệ Hỗ trợ</div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+
+          <a href="https://zalo.me/0559376085" target="_blank" class="outer-telegram-link" style="background:var(--bg2);"><i class="fa-solid fa-comment-sms" style="color:#0068ff;"></i> Zalo Admin: 0559376085</a>
+
+          <a href="https://t.me/jerry19_05" target="_blank" class="outer-telegram-link" style="background:var(--bg2);"><i class="fa-brands fa-telegram" style="color:#229ed9;"></i> Telegram: @jerry19_05</a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <!-- NAVIGATION BAR BÊN DƯỚI -->
+
+  <nav class="footer-nav">
+
+    <button class="nav-btn active" id="nav-home" onclick="navTabLink('home')">
+
+      <i class="fa-solid fa-house nav-icon"></i>
+
+      <span class="nav-label">Home Tool</span>
+
+    </button>
+
+    <button class="nav-btn" id="nav-info" onclick="navTabLink('info')">
+
+      <i class="fa-solid fa-circle-info nav-icon"></i>
+
+      <span class="nav-label">Thông tin</span>
+
+    </button>
+
+  </nav>
+
+
+
+  <!-- OVERLAY THÔNG BÁO -->
+
+  <div class="overlay" id="notifOverlay">
+
+    <div class="sheet">
+
+      <div class="sheet-title"><span>Thông báo hệ thống</span><div class="sheet-close" onclick="closeSheet('notifOverlay')">x</div></div>
+
+      <div class="hint" style="font-size:12px; line-height:1.6; color:white;">
+
+        • Giao diện tối ưu hóa riêng cho Xray Color Patcher.<br>
+
+        • Hỗ trợ quản lý độc lập 2 lớp cấu hình màu sắc.<br>
+
+        • File tải thành phẩm tự động bỏ đuôi .dat và gắn hậu tố _JerryMod.
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <script>
+
+    function navTabLink(tabName) {
+
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById('tab-' + tabName).classList.add('active');
+
+      document.getElementById('nav-' + tabName).classList.add('active');
+
+    }
+
+
+
+    function openNotifSheet() { document.getElementById('notifOverlay').classList.add('show'); document.getElementById('notifDot').style.display='none'; }
+
+    function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+
+
+
+    // =========================================================================
+
+    // 📍 ĐỊNH NGHĨA DỮ LIỆU 2 LỚP CẤU HÌNH MÀU SẮC (ĐÃ SỬA LỖI TÊN HÀM GỌI NÚT ĐÓNG MỞ)
+
+    // =========================================================================
+
+    const CONFIG_DATA_1 =[span_0](start_span)[span_0](end_span) "00 00 00 00 04 00 00 00 08 00 00 00 5F 4D 61 69 6E 54 65 78 07 00 00 00 54 65 78 74 75 72 65 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 05 00 00 00 77 68 69 74 65 00 00 00 02 00 00 00 0A 00 00 00 5F 58 52 61 79 43 6F 6C 6F 72 00 00 0B 00 00 00 58 2D 52 61 79 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 57 69 64 74 68 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 57 69 64 74 68 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00 00 00 E0 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 43 6F 6C 6F 72 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00";
+
+
+
+    const CONFIG_DATA_2 =[span_1](start_span)[span_1](end_span) "00 00 00 00 04 00 00 00 08 00 00 00 5F 4D 61 69 6E 54 65 78 07 00 00 00 54 65 78 74 75 72 65 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 05 00 00 00 77 68 69 74 65 00 00 00 02 00 00 00 0A 00 00 00 5F 58 52 61 79 43 6F 6C 6F 72 00 00 0B 00 00 00 58 2D 52 61 79 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 57 69 64 74 68 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 57 69 64 74 68 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00 00 00 E0 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 43 6F 6C 6F 72 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00 01 00 00 00 01 00 00 00 02 00 00 00 01 00 00 00 FE A9 F6 AA F8 32 1A 85";
+
+
+
+    const EMBEDDED_FIND_HEX =[span_2](start_span)[span_2](end_span) "00 00 00 00 05 00 00 00 08 00 00 00 5F 4D 61 69 6E 54 65 78 0A 00 00 00 42 61 73 65 20 28 52 47 42 29 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05 00 00 00 77 68 69 74 65 00 00 00 02 00 00 00 0D 00 00 00 5F 41 6D 62 69 6E 74 6C 69 67 68 74 00 00 00 0D 00 00 00 41 6D 62 69 6E 74 20 6C 69 67 68 74 00 00 00 00 00 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 41 00 00 00 00 00 00 00 00 01 00 00 00 0D 00 00 00 5F 53 74 72 65 74 63 68 52 61 74 69 6F 00 00 00 18 00 00 00 42 72 69 67 68 74 6E 65 73 73 20 53 74 72 65 74 63 68 20 52 61 74 69 6F 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 0A 00 00 00 5F 41 6C 70 68 61 4D 61 73 6B 00 00 0A 00 00 00 41 6C 70 68 61 20 4D 61 73 6B 00 00 00 00 00 00 02 00 00 00 01 00 00 00 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 14 00 00 00 5F 43 68 61 72 61 53 70 65 63 74 61 74 6F 72 43 6F 6C 6F 72 0E 00 00 00 53 70 65 63 74 61 74 6F 72 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 02 00 00 00 02 00 00 00 01 00 00 00 E5 F2 31 2F 73 B6 FC DA BE 21 F6 29 64 FD DA 05 01 00 00 00 0E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41";
+
+
+
+    let originalBytes = null;
+
+    let workingBytes = null;
+
+    let targetFileBytes = null;
+
+    let currentFileName = "";
+
+    let activeConfigId = 1;
+
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      if (EMBEDDED_FIND_HEX.trim() !== "") {
+
+        const cleanFind = EMBEDDED_FIND_HEX.replace(/[^0-9a-fA-F]/g, '');
+
+        let splitFind = [];
+
+        for (let i = 0; i < cleanFind.length; i += 2) {
+
+          splitFind.push(cleanFind.substr(i, 2).toUpperCase());
+
+        }
+
+        document.getElementById('txtFindHex').value = splitFind.join(" ");
+
+      }
+
+
+
+      switchConfig(1);
+
+    });
+
+
+
+    function switchConfig(id) {
+
+      activeConfigId = id;
+
+      document.getElementById('btnConfig1').classList.toggle('active', id === 1);
+
+      document.getElementById('btnConfig2').classList.toggle('active', id === 2);
+
+      
+
+      const hexToLoad = (id === 1) ? CONFIG_DATA_1 : CONFIG_DATA_2;
+
+      initEngine(hexToLoad);
+
+      setStatus(`Đã chuyển sang sử dụng cấu hình Lớp ${id}`, 'ok');
+
+    }
+
+
+
+    function initEngine(hexString) {
+
+      try {
+
+        const cleanString = hexString.replace(/[^0-9a-fA-F]/g, '');
+
+        if (cleanString.length % 2 !== 0) return;
+
+        const bytes = new Uint8Array(cleanString.match(/.{1,2}/g).map(h => parseInt(h, 16)));
+
+        originalBytes = new Uint8Array(bytes);
+
+        workingBytes = new Uint8Array(bytes);
+
+        scanAllColors();
+
+        updateHexOutput();
+
+      } catch (err) {
+
+        console.error(err);
+
+      }
+
+    }
+
+
+
+    function findAll(hay, needle) {
+
+      const hits = [];
+
+      const limit = hay.length - needle.length;
+
+      outer: for (let i = 0; i <= limit; i++) {
+
+        for (let j = 0; j < needle.length; j++) {
+
+          if (hay[i + j] !== needle[j]) continue outer;
+
+        }
+
+        hits.push(i);
+
+      }
+
+      return hits;
+
+    }
+
+
+
+    const readU32 = (b, off) => new DataView(b.buffer, b.byteOffset + off, 4).getUint32(0, true);
+
+    const readF32 = (b, off) => new DataView(b.buffer, b.byteOffset + off, 4).getFloat32(0, true);
+
+    const writeF32 = (b, off, v) => new DataView(b.buffer, b.byteOffset + off, 4).setFloat32(0, v, true);
+
+    const toHex2 = v => v.toString(16).padStart(2,'0').toUpperCase();
+
+    function f01to255(f) { return Math.max(0, Math.min(255, Math.round(f * 255))); }
+
+
+
+    function setStatus(msg, kind) {
+
+      const el = document.getElementById('status');
+
+      if(el) { el.className = 'status ' + (kind || ''); el.textContent = msg; }
+
+    }
+
+
+
+    function isValidColorProperty(pos, len) {
+
+      if (pos < 4) return null;
+
+      const nameLen = readU32(workingBytes, pos - 4);
+
+      if (nameLen !== len) return null;
+
+      let p = pos + len;
+
+      p += (4 - (len % 4)) % 4; 
+
+      if (p + 4 > workingBytes.length) return null;
+
+      const descLen = readU32(workingBytes, p); p += 4;
+
+      if (descLen < 0 || descLen > 128) return null;
+
+      if (p + descLen > workingBytes.length) return null;
+
+      
+
+      const desc = new TextDecoder('ascii').decode(workingBytes.subarray(p, p + descLen));
+
+      p += descLen;
+
+      p += (4 - (descLen % 4)) % 4;
+
+      if (p + 12 + 16 > workingBytes.length) return null;
+
+      
+
+      const attrCount = readU32(workingBytes, p); p += 4;
+
+      const type = readU32(workingBytes, p); p += 4;
+
+      if (type !== 0) return null; 
+
+      const flags = readU32(workingBytes, p); p += 4;
+
+      return { desc, colorOff: p };
+
+    }
+
+
+
+    function scanAllColors() {
+
+      const container = document.getElementById('masks'); if(!container) return; container.innerHTML = '';
+
+      const targetProperties = [
+
+        { text: '_Color', len: 6 },
+
+        { text: '_MainTex', len: 8 },
+
+        { text: '_MaskColor', len: 10 },
+
+        { text: '_XRayColor', len: 10 },
+
+        { text: '_OutLineColor', len: 13 },
+
+        { text: '_Ambientlight', len: 13 },
+
+        { text: '_StretchRatio', len: 13 },
+
+        { text: '_AlphaMask', len: 10 },
+
+        { text: '_CharaSpectatorColor', len: 20 }
+
+      ];
+
+
+
+      for (const prop of targetProperties) {
+
+        const needle = new TextEncoder().encode(prop.text);
+
+        const hits = findAll(workingBytes, needle);
+
+        for (const pos of hits) {
+
+          const info = isValidColorProperty(pos, prop.len);
+
+          if (!info) continue;
+
+          container.appendChild(buildMaskCard(info));
+
+        }
+
+      }
+
+    }
+
+
+
+    function buildMaskCard(info) {
+
+      const off = info.colorOff;
+
+      const card = document.createElement('div');
+
+      card.className = 'card-mask';
+
+      card.innerHTML = `
+
+        <header>
+
+          <span class="title">${info.desc}</span>
+
+        </header>
+
+        <div class="mask-grid">
+
+          <div class="swatch" data-role="swatch"></div>
+
+          <div><input type="text" data-role="hex" spellcheck="false" placeholder="#RRGGBBAA"></div>
+
+          <div><input type="color" data-role="picker"></div>
+
+        </div>
+
+      `;
+
+      const els = {};
+
+      card.querySelectorAll('[data-role]').forEach(el => els[el.dataset.role] = el);
+
+
+
+      const read = () => ({
+
+        r: readF32(workingBytes, off), g: readF32(workingBytes, off + 4),
+
+        b: readF32(workingBytes, off + 8), a: readF32(workingBytes, off + 12),
+
+      });
+
+
+
+      const write = c => {
+
+        writeF32(workingBytes, off, c.r);
+
+        writeF32(workingBytes, off + 4, c.g);
+
+        writeF32(workingBytes, off + 8, c.b);
+
+        writeF32(workingBytes, off + 12, c.a);
+
+        updateHexOutput();
+
+      };
+
+
+
+      const refresh = () => {
+
+        const c = read();
+
+        const r8 = f01to255(c.r), g8 = f01to255(c.g), b8 = f01to255(c.b), a8 = f01to255(c.a);
+
+        const hex = '#' + [r8,g8,b8,a8].map(toHex2).join('');
+
+        els.hex.value = hex;
+
+        els.picker.value = '#' + [r8,g8,b8].map(toHex2).join('');
+
+        els.swatch.style.setProperty('--c', `rgba(${r8},${g8},${b8},${(a8/255).toFixed(3)})`);
+
+      };
+
+
+
+      const fromHex = s => {
+
+        let x = s.replace(/^#/, '').trim();
+
+        if (x.length === 6) x += 'FF';
+
+        if (!/^[0-9a-fA-F]{8}$/.test(x)) return null;
+
+        return {
+
+          r: parseInt(x.substr(0,2),16)/255, g: parseInt(x.substr(2,2),16)/255,
+
+          b: parseInt(x.substr(4,2),16)/255, a: parseInt(x.substr(6,2),16)/255,
+
+        };
+
+      };
+
+
+
+      els.hex.addEventListener('input', () => { const c = fromHex(els.hex.value); if (c) { write(c); refresh(); } });
+
+      els.picker.addEventListener('input', () => {
+
+        const curColor = read(); const a8 = f01to255(curColor.a);
+
+        const c = fromHex(els.picker.value + toHex2(a8)); if (c) { write(c); refresh(); }
+
+      });
+
+
+
+      refresh();
+
+      return card;
+
+    }
+
+
+
+    function updateHexOutput() {
+
+      if (!workingBytes) return;
+
+      let hexStrings = [];
+
+      for (let i = 0; i < workingBytes.length; i++) hexStrings.push(toHex2(workingBytes[i]));
+
+      const box = document.getElementById('hexOutputBox');
+
+      if (box) box.textContent = hexStrings.join(" ");
+
+    }
+
+
+
+    function copyFullHex() {
+
+      const box = document.getElementById('hexOutputBox');
+
+      if (!box || !box.textContent) return;
+
+      navigator.clipboard.writeText(box.textContent).then(() => {
+
+        const tip = document.getElementById('copyTip');
+
+        if (tip) { tip.textContent = "✅ ĐÃ SAO CHÉP TOÀN BỘ CHUỖI HEX!"; tip.style.color = "#00e87a"; }
+
+      });
+
+    }
+
+
+
+    const dropZone = document.getElementById('drop');
+
+    const fileInput = document.getElementById('file');
+
+    if (dropZone && fileInput) {
+
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('hover'); });
+
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
+
+      dropZone.addEventListener('drop', e => {
+
+        e.preventDefault(); dropZone.classList.remove('hover');
+
+        if (e.dataTransfer.files[0]) loadTargetFile(e.dataTransfer.files[0]);
+
+      });
+
+      fileInput.addEventListener('change', e => { if (e.target.files[0]) loadTargetFile(e.target.files[0]); });
+
+    }
+
+
+
+    async function loadTargetFile(file) {
+
+      try {
+
+        const buf = await file.arrayBuffer();
+
+        targetFileBytes = new Uint8Array(buf);
+
+        currentFileName = file.name;
+
+        const info = document.getElementById('fileDropInfo');
+
+        if (info) info.innerHTML = `📁 Đã nhận diện: <b>${file.name}</b> (${targetFileBytes.length.toLocaleString()} bytes)`;
+
+        setStatus(`Đã sẵn sàng ghi đè file "${file.name}"!`, 'ok');
+
+      } catch (err) {
+
+        setStatus('❌ Lỗi đọc file: ' + err.message, 'err');
+
+      }
+
+    }
+
+
+
+    document.getElementById('btnExecutePatch').addEventListener('click', () => {
+
+      if (!targetFileBytes) { setStatus("❌ Lỗi: Bạn chưa nạp file gốc cần đè!", "err"); return; }
+
+      const findClean = document.getElementById('txtFindHex').value.replace(/[^0-9a-fA-F]/g, '');
+
+      const replaceClean = document.getElementById('txtReplaceHex').value.replace(/[^0-9a-fA-F]/g, '');
+
+
+
+      if (!findClean || !replaceClean) { setStatus("❌ Lỗi: Vui lòng nhập chuỗi HEX thay thế!", "err"); return; }
+
+
+
+      const findNeedle = new Uint8Array(findClean.match(/.{1,2}/g).map(h => parseInt(h, 16)));
+
+      const replacePayload = new Uint8Array(replaceClean.match(/.{1,2}/g).map(h => parseInt(h, 16)));
+
+      const matchPositions = findAll(targetFileBytes, findNeedle);
+
+
+
+      if (matchPositions.length === 0) { setStatus("❌ Không tìm thấy chuỗi mã HEX tương thích trong file gốc!", "err"); return; }
+
+
+
+      for (const pos of matchPositions) {
+
+        const writeLength = Math.min(replacePayload.length, findNeedle.length);
+
+        for (let i = 0; i < writeLength; i++) targetFileBytes[pos + i] = replacePayload[i];
+
+      }
+
+
+
+      setStatus(`⚡ VÁ FILE THÀNH CÔNG (Cấu hình Lớp ${activeConfigId}) tại ${matchPositions.length} vị trí!`, "ok");
+
+      document.getElementById('btnSave').disabled = false;
+
+    });
+
+
+
+    document.getElementById('btnSave').addEventListener('click', () => {
+
+      if (!targetFileBytes) return;
+
+      const blob = new Blob([targetFileBytes], { type: 'application/octet-stream' });
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+
+      a.href = url; 
+
+      a.download = currentFileName ? currentFileName.replace(/(\.dat)?$/i, '') + '_JerryMod' : "JerryMod_file";
+
+      a.click();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      setStatus("💾 Đã tải thành công file thành phẩm!", "ok");
+
+    });
+
+
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+
+      if (!originalBytes) return;
+
+      workingBytes = new Uint8Array(originalBytes);
+
+      scanAllColors();
+
+      updateHexOutput();
+
+      setStatus(`↺ Đã khôi phục dữ liệu màu về mặc định (Lớp ${activeConfigId}).`, "ok");
+
+    });
+
+  </script>
+
+</body>
+
+</html>
+
