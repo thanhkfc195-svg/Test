@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jerry Mod Studio </title>
+<style>
+  :root{
+    --bg:#0b0f0d;
+    --panel:#121815;
+    --line:#1f2b25;
+    --text:#dfeee6;
+    --dim:#7fa393;
+    --accent:#3ddc84;
+    --accent-dim:#245c3f;
+    --bad:#ff6b6b;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f6f7f9; --panel:#fff; --text:#14171c; --dim:#5d6673; --line:#dfe3e9;
+      --accent:#2f6fed; --accent-dim:#1d4ed8; --bad:#c0392b;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  header{margin-bottom:24px;}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:8px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;background:var(--accent);border-radius:1px;display:inline-block;}
+  h1{
+    font-family:var(--mono);
+    font-size:clamp(22px,4vw,30px);
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  h1 span{color:var(--accent);}
+  .sub{color:var(--dim);font-size:14px;line-height:1.5;max-width:65ch;}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    margin-top:16px;
+  }
+  .panel h2{font-size:16px;font-family:var(--mono);margin:0 0 12px;color:var(--text);}
+
+  .drop{
+    border:1.5px dashed var(--line);
+    border-radius:8px;
+    padding:30px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    font-family:var(--mono);
+    background:var(--panel);
+  }
+  .drop.has{border-color:var(--accent);border-style:solid;}
+  .drop .big{font-size:14px;color:var(--text);margin-bottom:6px;}
+  .drop .small{font-size:12px;color:var(--dim);}
+  input[type=file]{display:none;}
+
+  button{
+    font-family:var(--mono);
+    font-size:13px;
+    font-weight:500;
+    padding:11px 20px;
+    border-radius:6px;
+    border:1px solid var(--accent-dim);
+    background:var(--accent);
+    color:#08130d;
+    cursor:pointer;
+    transition:opacity .15s;
+  }
+  button:hover:not(:disabled){opacity:.85;}
+  button:disabled{opacity:.35;cursor:not-allowed;}
+  .row{display:flex;gap:10px;align-items:center;}
+
+  .msg{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;border:1px solid;font-family:var(--mono);}
+  .msg.ok{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:color-mix(in srgb,var(--accent) 9%,transparent)}
+  .msg.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,transparent);background:color-mix(in srgb,var(--bad) 9%,transparent)}
+
+  .config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px;}
+  .config-item{background:var(--bg);padding:10px;border-radius:8px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);}
+  .config-item label{font-size:12px;font-weight:500;color:var(--dim);font-family:var(--mono);}
+  .config-item input[type="color"]{width:100%;height:28px;border:none;border-radius:4px;cursor:pointer;background:transparent;}
+
+  table.hex{font-family:var(--mono);font-size:11.5px;width:100%;border-collapse:collapse;margin-top:10px;}
+  table.hex th{text-align:left;color:var(--dim);padding:0 12px 6px 0;border-bottom:1px solid var(--line)}
+  table.hex td{padding:6px 12px 6px 0;border-bottom:1px solid var(--line);word-break:break-all;}
+  .new{color:var(--accent)} .dim{color:var(--dim)}
+  .hexwrap{overflow-x:auto;}
+  .fname{font-family:var(--mono);font-size:12.5px;background:var(--bg);padding:8px 10px;border-radius:7px;display:block;margin-top:6px;border:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Jerry Mod Studio — Định Vị Skin Súng </div>
+    <h1>TOOL MAKE ĐỊNH VỊ <span>SKIN SÚNG</span></h1>
+    <p class="sub">Tool Thuộc Bản Quyền Jerry Mod.</p>
+  </header>
+
+  <div class="panel">
+    <div id="drop" class="drop">
+      <div id="dropText">
+        <b>Thả file bundle vào đây</b>
+        <span>hoặc bấm để chọn file cần mod định vị skin</span>
+      </div>
+      <input type="file" id="file" class="hide">
+    </div>
+    <div id="info"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Bảng điều khiển màu sắc định vị</h2>
+    <p class="sub" style="margin-bottom:10px">Tùy chỉnh trực quan các thông số được ánh xạ vào bộ nhớ đệm Hex.</p>
+    <div class="config-grid" id="presetControls"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Chức năng tự động</h2>
+    <div class="row">
+      <button id="go" disabled>CHẠY LỆNH </button>
+    </div>
+  </div>
+
+  <div id="out"></div>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const AUTO_CONFIG = {
+    targetPathIDs: [
+      "-3333330928057165289",
+      "-6375313063198326696",
+      "3504935391519681939"
+    ],
+    propertiesToEdit: ["_XRayColor", "_OutLineColor", "_OutLineWidth"],
+    rawHexSource: "00 00 00 00 04 00 00 00 08 00 00 00 5F 4D 61 69 6E 54 65 78 07 00 00 00 54 65 78 74 75 72 65 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 05 00 00 00 77 68 69 74 65 00 00 00 02 00 00 00 0A 00 00 00 5F 58 52 61 79 43 6F 6C 6F 72 00 00 0B 00 00 00 58 2D 52 61 79 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 57 69 64 74 68 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 57 69 64 74 68 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00 00 00 E0 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 43 6F 6C 6F 72 00 00 00 0D 00 00 00 4F 75 74 6C 69 6E 65 20 43 6F 6C 6F 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00 01 00 00 00 01 00 00 00 02 00 00 00 01 00 00 00 FE A9 F6 AA F8 32 1A 85 27 2E 62 48 1B 4D 72 47 01 00 00 00 0E 00 00 00 0A 00 00 00 08 00 00 00 46 47 6C 6F 62 61 6C 73 08 00 00 00 08 00 00 00 56 47 6C 6F 62 61 6C 73 00 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 43 6F 6C 6F 72 00 00 00 09 00 00 00 0D 00 00 00 5F 4F 75 74 4C 69 6E 65 57 69 64 74 68 00 00 00 02 00 00 00 14 00 00 00 5F 57 6F 72 6C 64 53 70 61 63 65 43 61 6D 65 72 61 50 6F 73 01 00 00 00 19 00 00 00 67 6C 73 74 61 74 65 5F 6D 61 74 72 69 78 5F 70 72 6F 6A 65 63 74 69 6F 6E 00 00 00 05 00 00 00 10 00 00 00 75 6E 69 74 79 5F 4D 61 74 72 69 78 49 6E 76 56 07 00 00 00 0D 00 00 00 75 6E 69 74 79 5F 4D 61 74 72 69 78 56 00 00 00 06 00 00 00 13 00 00 00 75 6E 69 74 79 5F 4F 62 6A 65 63 74 54 6F 57 6F 72 6C 64 00 03 00 00 00 13 00 00 00 75 6E 69 74 79 5F 57 6F 72 6C 64 54 6F 4F 62 6A 65 63 74 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 40 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 20 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 A0 40 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 20 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 70 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 00 00 80 3F 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 40 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 41 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 7F 43 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 7F 43 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 0E 00 00 00 75 6E 69 74 79 5F 46 6F 67 53 74 61 72 74 00 00 00 00 00 00 0C 00 00 00 75 6E 69 74 79 5F 46 6F 67 45 6E 64 00 00 00 00 10 00 00 00 75 6E 69 74 79 5F 46 6F 67 44 65 6E 73 69 74 79 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 00 00 00 00 09 00 00 00 3C 6E 6F 6E 69 6E 69 74 3E 00 00 00 0E 00 00 00 75 6E 69 74 79 5F 46 6F 67 43 6F 6C 6F 72 00 00 FF FF FF FF 4C CB 01 00 01 00 00 00 05 00 00 00 51 55 45 55 45 00 00 00 09 00 00 00 41 6C 70 68 61 54 65 73 74 00 00 00 00 00 00 00 00 00 00 00 06 00 00 00 00 00 00 00 04 00 00 00 02 00 00 00 08 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 09 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 02 00 00 00 08 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 09 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 02 00 00 00 08 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 09 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 17 00 00 00 00 00 00 00 04 00 00 00 02 00 00 00 07 00 00 00 07 00 00 00 02 00 00 00 07 00 00 00 07 00 00 00 02 00 00 00 07 00 00 00 07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 03 00 00 00 02 00 00 00 10 00 00 00 00 00 00 00 00 04 00 00 03 00 00 00 50 00 00 00 00 00 00 00 00 04 00 00 04 00 00 00 90 00 00 00 00 00 00 00 00 04 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 03 00 00 00 00 00 00 D0 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 05 00 00 00 00 00 01 00 02 00 03 00 04 00 00 00 00 00 00 00 04 00 00 00 02 00 00 00 0A 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 0B 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 02 00 00 00 0A 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 0B 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 02 00 00 00 0A 00 00 00 00 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 0B 00 00 00 01 00 00 00 04 00 00 00 21 00 00 00 00 00 00 00 18 00 00 00 00 00 00 00 04 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 05 00 00 00 00 00 00 00 01 00 00 00 06 00 00 00 00 00 00 00 00 00 00 00 03 04 00 00 00 00 00 00 08 00 00 00 01 00 00 00 01 00 00 00 05 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 05 00 00 00 00 00 01 00 02 00 03 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 05 00 00 00 51 55 45 55 45 00 00 00 09 00 00 00 41 6C 70 68 61 54 65 73 74 00 00 00 00 00 00 00 05 00 00 00 14 00 00 00 53 54 45 52 45 4F 5F 49 4E 53 54 41 4E 43 49 4E 47 5F 4F 4E 18 00 00 00 55 4E 49 54 59 5F 53 49 4E 47 4C 45 5F 50 41 53 53 5F 53 54 45 52 45 4F 13 00 00 00 53 54 45 52 45 4F 5F 4D 55 4C 54 49 56 49 45 57 5F 4F 4E 00 18 00 00 00 53 54 45 52 45 4F 5F 43 55 42 45 4D 41 50 5F 52 45 4E 44 45 52 5F 4F 4E 0C 00 00 00 5F 4C 49 50 50 49 4E 47 5F 4F 4E 05 00 00 00 00 00 00 00 00 00 00 00 15 00 00 00 42 52 4D 6F 62 69 6C 65 2F 53 70 65 63 69 61 6C 2F 58 52 61 79 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 0E 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 37 08 00 00 01 00 00 00 01 00 00 00 F4 43 00 00 37 08 00 00 A2 0C 00 00 00 94 00 00 00 34 00 01 00 62 C8 00 00 00 40 11 0C 00 53 08 12 00 00 50 0C 00 26 58 23 24 00 53 8C 23 00 00 50 0C 00 62 DC 23 00 00 80 02 0C 00 62 5C 26 00 00 B8 04 0C 00 26 14 2B 30 00 63 48 2B 00 00 CC 08 18 00 43 34 00 00 DC 0C 00 53 F0 3C 00 00 7C 3C 00 53 6C 3F 00 00 88 3C 00 6E BA 75 0A 0C 02 00 01 00 00 37 00 AA 56 47 6C 6F 62 61 6C 73 54 01 1C 00 00 34 00 2F 17 00 01 00 03 FF 02 FE 10 00 00 FE CA 0D F0 30 00 00 00 06 00 00 00 3C 28 00 04 80 25 00 00 00 FF FF FF FF 0C 00 FC 15 78 6C 61 74 4D 74 6C 4D 61 69 6E 00 23 69 6E 63 6C 75 64 65 20 3C 6D 65 74 61 6C 5F 73 74 64 6C 69 62 3E 0A 18 00 F1 0A 74 65 78 74 75 72 65 3E 0A 75 73 69 6E 67 20 6E 61 6D 65 73 70 61 63 65 20 1F 00 94 3B 0A 73 74 72 75 63 74 20 C3 00 F0 0B 5F 54 79 70 65 0A 7B 0A 20 20 20 20 66 6C 6F 61 74 33 20 5F 57 6F 72 6C 64 53 35 00 A6 43 61 6D 65 72 61 50 6F 73 3B 21 00 F1 0E 34 20 68 6C 73 6C 63 63 5F 6D 74 78 34 78 34 75 6E 69 74 79 5F 4F 62 6A 65 63 74 54 6F 3B 00 3F 5B 34 5D 30 00 0D 01 28 00 22 54 6F 37 00 0F 30 00 0A F0 03 67 6C 73 74 61 74 65 5F 6D 61 74 72 69 78 5F 70 72 6F 33 00 3F 69 6F 6E 66 00 10 11 4D 34 00 1F 56 2A 00 16 3B 49 6E 76 2D 00 F4 04 20 5F 4F 75 74 4C 69 6E 65 57 69 64 74 68 3B 0A 7D 3B 0A 42 01 C8 4D 74 6C 5F 56 65 72 74 65 78 49 6E 41 01 F7 10 34 20 50 4F 53 49 54 49 4F 4E 30 20 5B 5B 20 61 74 74 72 69 62 75 74 65 28 30 29 20 5D 5D 20 5D 00 AB 32 20 54 45 58 43 4F 4F 52 44 2A 00 1C 31 2A 00 8B 33 20 4E 4F 52 4D 41 4C 28 00 13 32 28 00 0F 96 00 02 3A 4F 75 74 97 00 80 6D 74 6C 5F 50 6F 73 69 3D 01 00 48 00 13 70 0C 00 EF 2C 20 69 6E 76 61 72 69 61 6E 74 20 5D 5D A0 00 07 55 75 73 65 72 28 12 00 00 7B 00 02 7A 00 11 76 6F 00 0A 7A 00 17 20 BB 02 11 28 52 00 7B 63 6F 6E 73 74 61 6E 7A 02 15 26 0F 00 00 62 00 62 62 75 66 66 65 72 29 01 11 2C 36 00 08 65 01 60 20 69 6E 70 75 74 28 00 EB 73 74 61 67 65 5F 69 6E 20 5D 5D 29 0A 7B 29 00 00 7E 00 69 6F 75 74 70 75 74 F5 01 20 75 5F 93 00 1F 30 14 00 00 1F 31 14 00 00 18 32 04 02 02 13 00 12 36 13 00 03 48 00 65 2E 78 79 7A 20 3D BE 00 1F 2E E4 02 0E 21 31 5D 33 00 1E 2A 33 00 0F 87 02 03 6F 32 5D 2E 79 79 79 74 00 01 4F 66 6D 61 28 78 00 17 11 30 78 00 1F 2C 77 00 18 48 78 78 78 2C 73 00 1F 29 85 00 2F 1F 32 85 00 1E 3F 7A 7A 7A 85 00 3D 1F 33 85 00 1E 3F 77 77 77 85 00 09 00 83 00 47 64 6F 74 28 22 00 12 2C A5 02 13 2E AF 03 0D 35 00 1F 31 38 02 4E 1D 30 38 02 1F 31 38 02 51 19 30 38 02 1E 31 F9 00 0F 38 02 51 19 30 38 02 0F 85 00 00 0F 38 02 51 19 30 38 02 1F 31 BD 02 01 09 38 02 1F 31 38 02 73 1F 31 38 02 63 1F 31 38 02 71 1F 31 38 02 71 1F 31 38 02 0E 1F 79 38 02 1F 1E 36 A3 04 0F 57 05 07 00 2D 00 44 72 73 71 72 2F 00 1D 36 75 05 23 20 3D 1A 08 05 22 00 27 20 2A 1F 00 0F 2F 00 00 07 0D 00 14 2A 3C 00 05 11 01 09 5D 09 0F 72 01 02 02 DE 00 05 51 09 00 A3 02 0E D3 02 0F 8A 0A 08 02 06 03 0F CC 01 21 0A 48 00 04 D6 02 0C 90 00 0F BC 02 32 0A 6B 00 1F 32 6B 00 04 0F A2 02 12 08 0E 00 1F 2B 28 01 18 1D 33 28 01 17 32 4E 00 1E 79 77 01 0F 6B 0B 05 2C 31 5D 45 00 0E FE 00 0F 3A 00 03 27 30 5D DF 00 07 58 01 1A 32 E9 00 0F 52 00 18 17 32 52 00 17 7A 3F 01 0E 52 00 04 0A 00 1F 2B E4 00 12 2F 33 5D 18 03 01 27 6D 61 66 03 14 2C EC 02 52 30 2E 30 30 39 01 00 49 37 38 2C 20 0F 00 18 29 D0 01 1F 29 7D 01 03 1E 30 7D 01 0F 1E 0D 13 0A 89 01 1E 30 37 01 0F 46 00 12 06 95 01 1E 30 95 01 0F 5E 00 2E 0F A1 01 05 1F 30 5E 00 32 17 33 5E 00 18 77 CB 09 0F 3A 03 02 26 28 2D 97 04 0F 01 0F 00 00 26 00 11 78 77 03 0F 58 03 2C 1F 31 FF 07 00 0F D9 03 0B 37 20 3D 20 95 05 33 31 2E 78 21 00 02 E5 0C 18 2E D7 0D 29 2E 7A 8A 02 32 31 2E 78 73 02 22 31 30 01 00 16 35 CE 01 1F 7A 46 00 08 39 78 79 77 BB 05 19 77 2B 00 05 03 0E 02 F9 02 2C 69 6E 15 00 02 2E 00 65 72 65 74 75 72 6E 8B 0D 93 7D 0A 00 00 13 00 00 00 03 E8 10 40 0D 00 00 00 6B 11 40 0E 00 00 00 47 11 1F 0F 40 11 08 00 20 00 00 24 12 CF 5F 43 4C 49 50 50 49 4E 47 5F 4F 4E 50 11 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 26 0F C4 22 05 13 46 74 01 2E 08 00 C4 22 0F 34 00 19 13 01 1C 00 10 5F 9B 0E 38 54 65 78 34 00 13 04 50 00 1F 18 9C 11 04 2F 57 02 C4 11 73 05 4C 0F C2 75 69 6E 74 33 32 5F 74 20 72 70 5F 69 01 B0 5F 72 65 6D 61 70 5F 6D 61 73 6B 2A 0F 31 66 75 6E 0D 03 14 5F 33 00 02 5C 10 07 43 00 01 09 00 01 49 00 0D 45 00 00 79 03 1F 28 5A 00 02 B5 3E 3E 20 30 29 20 26 20 30 78 46 52 12 1F 46 52 12 00 55 68 61 6C 66 34 44 11 5D 43 6F 6C 6F 72 AE 10 86 46 72 61 67 6D 65 6E 74 B0 10 02 36 00 91 53 56 5F 54 61 72 67 65 74 7D 10 10 63 3C 00 0D 8D 00 07 86 10 13 66 47 00 0C 54 00 0F 8A 10 08 1A 46 8A 10 1F 46 8A 10 04 08 63 10 08 59 00 08 65 10 03 1B 03 07 B4 00 3C 3D 20 46 E7 08 03 00 01 0F 1D 03 04 07 D0 02 1F 18 54 14 14 2F 80 04 90 02 FF 49 0A D6 13 0F 0C 13 0E 1F 20 D9 02 9F 02 63 13 74 73 61 6D 70 6C 65 72 08 00 04 18 05 01 68 13 03 1B 00 08 2F 00 03 0C 02 30 32 64 3C CE 00 A2 2C 20 61 63 63 65 73 73 3A 3A 2C 00 38 20 3E 20 41 00 03 2D 00 03 FB 14 1D 2C 47 03 0F D5 13 01 0F 72 03 14 00 7E 00 04 24 07 23 36 5F D8 13 43 62 6F 6F 6C 15 00 2F 62 30 28 00 01 19 31 5C 07 11 36 53 02 04 B1 00 12 2E C3 00 1B 28 09 01 1F 2C E2 06 00 3B 29 2E 77 49 00 07 46 0A 00 56 00 11 2B 78 00 59 28 2D 30 2E 35 CF 07 28 62 30 28 00 11 31 44 01 00 24 0A 03 25 00 74 69 66 28 28 28 69 6E EC 07 20 62 30 60 0D 00 10 00 33 30 78 66 01 00 F4 02 75 29 29 29 21 3D 30 29 7B 64 69 73 63 61 72 64 5F 20 02 4F 28 29 3B 7D 8C 04 03 03 E2 08 0F 90 04 03 06 A0 08 0E 38 00 00 06 08 0B A2 00 0F B9 04 00 0F 80 2A 17 2F D0 00 80 2A 17 2F 94 08 30 19 FF 24 09 AB 0C 11 50 2B 00 0F B5 18 5B 0F 8D 18 44 1F 33 8D 18 0F 0F A4 00 00 1D 31 2C 00 1F 31 B9 18 C3 0F A5 18 02 0F 41 11 01 0F 42 11 1F 0E 8C 0D 0F 3A 11 1B 0F 36 11 02 1E 78 EC 0D 0F 60 00 23 2E 32 5D 2B 11 0F 4C 0E 0B 04 0A 00 0F C8 0D 1B 0F 33 10 03 1F 30 1C 11 18 1B 50 4C 01 0F CB 10 18 1F 50 89 0F 06 2F 31 29 53 00 26 06 7E 0F 0A 32 01 1F 31 1A 0E 07 0F 5F 00 19 17 33 5F 00 08 7F 0F 2F 31 29 49 1B 01 0F 7D 0F 10 0E 69 01 0F 02 17 11 0F 42 1B 40 0F 20 10 06 0F 3B 1B 52 0F 7E 00 07 0F 34 1B 12 08 0E 00 2F 2B 20 CE 16 1D 0F 52 00 0F 2D 28 2D EE 03 0F 94 16 41 0F 8C 10 00 14 7A 9E 16 1F 33 9E 16 03 1F 7A 3A 00 02 1F 31 C6 10 1C 00 DB 33 1E 02 C4 10 0F 0C 22 1A 0F DC 08 FF FF FF FF FF FF FF FF A9 0F 14 19 05 1F 51 14 19 FF 25 4F 58 52 61 79 11 19 E6 07 FD 00 0F 0E 19 04 0F 10 19 22 2F 4D 04 8C 02 FF 46 0E 0D 19 0F 84 0A 06 0F 0D 19 FF DB 1F 31 0D 19 9E 0F 88 04 20 50 00 00 00 00 00 00 01 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 1 00 00 00"
+  };
+
+  function hexToBytes(hex) {
+    const clean = hex.replace(/\s+/g, '');
+    const bytes = new Uint8Array(clean.length / 2);
+    for (let i = 0; i < clean.length; i += 2) {
+      bytes[i / 2] = parseInt(clean.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  let baseShaderBody = hexToBytes(AUTO_CONFIG.rawHexSource);
+
+  function lz4dec(src, outSize){
+    const dst = new Uint8Array(outSize);
+    const n = src.length;
+    let i = 0, o = 0;
+    while (i < n){
+      const tok = src[i++];
+      let lit = tok >> 4;
+      if (lit === 15){ let b; do { b = src[i++]; lit += b; } while (b === 255); }
+      if (lit){ dst.set(src.subarray(i, i + lit), o); i += lit; o += lit; }
+      if (i >= n) break;
+      const off = src[i] | (src[i+1] << 8); i += 2;
+      let ml = tok & 15;
+      if (ml === 15){ let b; do { b = src[i++]; ml += b; } while (b === 255); }
+      ml += 4;
+      let sp = o - off;
+      for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
+    }
+    return dst;
+  }
+
+  function lz4enc(src){
+    const n = src.length;
+    if (!n) return new Uint8Array(0);
+    const out = [];
+    const HLOG = 16, HSIZE = 1 << HLOG;
+    const head = new Int32Array(HSIZE).fill(-1);
+    const prev = new Int32Array(n).fill(-1);
+    const MFLIMIT = 12, LASTLIT = 5, MAXDIST = 65535, CHAIN = 32;
+    const h4 = i => (Math.imul((src[i] | (src[i+1]<<8) | (src[i+2]<<16) | (src[i+3]<<24)) >>> 0, 2654435761) >>> (32 - HLOG));
+    const same4 = (a, b) => src[a]===src[b] && src[a+1]===src[b+1] && src[a+2]===src[b+2] && src[a+3]===src[b+3];
+    const emit = (ls, le, mlen, moff) => {
+      const litlen = le - ls;
+      const ml = mlen ? mlen - 4 : 0;
+      out.push(((litlen >= 15 ? 15 : litlen) << 4) | (ml >= 15 ? 15 : ml));
+      if (litlen >= 15){ let r = litlen - 15; while (r >= 255){ out.push(255); r -= 255; } out.push(r); }
+      for (let k = ls; k < le; k++) out.push(src[k]);
+      if (mlen){
+        out.push(moff & 255, (moff >> 8) & 255);
+        if (ml >= 15){ let r = ml - 15; while (r >= 255){ out.push(255); r -= 255; } out.push(r); }
+      }
+    };
+    let anchor = 0, i = 0;
+    while (i < n - MFLIMIT){
+      const hv = h4(i);
+      let bestLen = 0, bestOff = 0, cur = head[hv], cnt = 0;
+      while (cur >= 0 && cnt < CHAIN){
+        const off = i - cur;
+        if (off > MAXDIST) break;
+        if (same4(cur, i)){
+          let l = 4; const lim = n - LASTLIT - i;
+          while (l < lim && src[cur+l] === src[i+l]) l++;
+          if (l > bestLen){ bestLen = l; bestOff = off; if (l >= 255) break; }
+        }
+        cur = prev[cur]; cnt++;
+      }
+      prev[i] = head[hv]; head[hv] = i;
+      if (bestLen >= 4){
+        emit(anchor, i, bestLen, bestOff);
+        const stop = Math.min(i + bestLen, n - 3);
+        for (let k = i + 1; k < stop; k++){ const hk = h4(k); prev[k] = head[hk]; head[hk] = hk; }
+        i += bestLen; anchor = i;
+      } else i++;
+    }
+    const litlen = n - anchor;
+    out.push((litlen >= 15 ? 15 : litlen) << 4);
+    if (litlen >= 15){ let r = litlen - 15; while (r >= 255){ out.push(255); r -= 255; } out.push(r); }
+    for (let k = anchor; k < n; k++) out.push(src[k]);
+    return new Uint8Array(out);
+  }
+
+  function lz4Trace(src, outSize){
+    const litOf  = new Int32Array(outSize).fill(-1);
+    const copyOf = new Int32Array(outSize).fill(-1);
+    let i = 0, o = 0;
+    while (i < src.length && o < outSize){
+      const tok = src[i++];
+      let lit = tok >> 4;
+      if (lit === 15){ let b; do { b = src[i++]; lit += b; } while (b === 255); }
+      for (let k = 0; k < lit; k++){ litOf[o++] = i++; }
+      if (i >= src.length) break;
+      const off = src[i] | (src[i+1] << 8); i += 2;
+      let ml = tok & 15;
+      if (ml === 15){ let b; do { b = src[i++]; ml += b; } while (b === 255); }
+      ml += 4;
+      let sp = o - off;
+      for (let k = 0; k < ml; k++){ copyOf[o] = sp; o++; sp++; }
+    }
+    const root = new Int32Array(outSize).fill(-1);
+    for (let k = 0; k < outSize; k++){
+      let cur = k, guard = 0;
+      while (litOf[cur] < 0 && copyOf[cur] >= 0 && guard++ < outSize) cur = copyOf[cur];
+      root[k] = litOf[cur] >= 0 ? litOf[cur] : -1;
+    }
+    return root;
+  }
+
+  function readShaderProps(body){
+    const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
+    let p = 0;
+    const rd = () => { const v = dv.getInt32(p, true); p += 4; return v; };
+    const str = () => {
+      const n = rd();
+      if (n < 0 || p + n > body.length) throw new Error('Lỗi cấu trúc shader');
+      const s = new TextDecoder().decode(body.subarray(p, p + n));
+      p = (p + n + 3) & ~3;
+      return s;
+    };
+    str();
+    const cnt = rd();
+    const props = [];
+    for (let i = 0; i < cnt; i++){
+      const name = str(), desc = str();
+      const na = rd();
+      for (let k = 0; k < na; k++) str();
+      const type = rd();
+      p += 4;
+      const valOff = p;
+      const val = [dv.getFloat32(p,true), dv.getFloat32(p+4,true), dv.getFloat32(p+8,true), dv.getFloat32(p+12,true)];
+      p += 16;
+      str(); p += 4;
+      props.push({ name, type, valOff, val });
+    }
+    return props;
+  }
+
+  function initHexColorUI() {
+    const container = document.getElementById('presetControls');
+    container.innerHTML = '';
+    let props = [];
+    try { props = readShaderProps(baseShaderBody); } catch(e) { return; }
+
+    AUTO_CONFIG.propertiesToEdit.forEach(propName => {
+      const prop = props.find(p => p.name === propName);
+      if (!prop) return;
+      const div = document.createElement('div');
+      div.className = 'config-item';
+      if (propName.toLowerCase().includes('color')) {
+        const [r, g, b] = prop.val;
+        const hexColor = "#" + [r,g,b].map(v => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0')).join('');
+        div.innerHTML = `<label>${propName}</label><input type="color" value="${hexColor}" data-prop="${propName}">`;
+      } else {
+        div.innerHTML = `<label>${propName} </label><input type="number" step="0.1" value="${prop.val[0]}" data-prop="${propName}" style="width:100%; padding:6px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:4px;">`;
+      }
+      container.appendChild(div);
+    });
+
+    container.addEventListener('input', e => {
+      const target = e.target;
+      const propName = target.dataset.prop;
+      if (!propName) return;
+      const prop = props.find(p => p.name === propName);
+      const dv = new DataView(baseShaderBody.buffer, baseShaderBody.byteOffset, baseShaderBody.byteLength);
+      if (target.type === 'color') {
+        const hex = target.value;
+        dv.setFloat32(prop.valOff, parseInt(hex.substr(1,2),16)/255, true);
+        dv.setFloat32(prop.valOff+4, parseInt(hex.substr(3,2),16)/255, true);
+        dv.setFloat32(prop.valOff+8, parseInt(hex.substr(5,2),16)/255, true);
+      } else {
+        dv.setFloat32(prop.valOff, parseFloat(target.value) || 0, true);
+      }
+    });
+  }
+
+  function parseBundle(u8){
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let p = 0;
+    const cstr = () => { let s = ''; while (u8[p]) s += String.fromCharCode(u8[p++]); p++; return s; };
+    const sig = cstr();
+    if (sig !== 'UnityFS') throw new Error(`Không phải UnityFS bundle (${sig})`);
+    
+    const fmt = dv.getUint32(p, false); p += 4;
+    cstr(); cstr();
+    const declared = Number(dv.getBigInt64(p, false)); p += 8;
+    const ciSize = dv.getUint32(p, false); p += 4;
+    const uiSize = dv.getUint32(p, false); p += 4;
+    const flags  = dv.getUint32(p, false); p += 4;
+    
+    let info, infoOff, dataStart = p;
+    const ic = flags & 0x3F;
+
+    if (flags & 0x80){
+      dataStart = (p + 15) & ~15;
+      const from = Math.min(declared, u8.length) - ciSize;
+      let found = false;
+      for (let off = from; off >= Math.max(0, from - 120000); off--){
+        try {
+          const cand = (ic === 2 || ic === 3) ? lz4dec(u8.subarray(off, off + ciSize), uiSize) : u8.subarray(off, off + ciSize).slice();
+          if (cand.length >= 16) {
+            info = cand;
+            infoOff = off;
+            found = true;
+            break;
+          }
+        } catch(e) {}
+      }
+      if (!found) throw new Error('Không tìm thấy khối dữ liệu BlocksInfo ở cuối file.');
+    } else {
+      if (fmt >= 7 || (flags & 0x200)) p = (p + 15) & ~15;
+      infoOff = p;
+      dataStart = p + ciSize;
+      const infoRaw = u8.subarray(p, p + ciSize);
+      info = (ic === 2 || ic === 3) ? lz4dec(infoRaw, uiSize) : infoRaw.slice();
+    }
+
+    const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+    let q = 16;
+    if (q + 4 > info.length) q = 0;
+    
+    const nB = idv.getUint32(q, false); q += 4;
+    const blocks = [];
+    for (let i = 0; i < nB; i++){
+      if (q + 10 > info.length) break;
+      blocks.push({ u: idv.getUint32(q,false), c: idv.getUint32(q+4,false), f: idv.getUint16(q+8,false) });
+      q += 10;
+    }
+
+    const nN = idv.getUint32(q, false); q += 4;
+    const nodes = [];
+    for (let i = 0; i < nN; i++){
+      if (q + 20 > info.length) break;
+      const off = Number(idv.getBigInt64(q,false));
+      const sz = Number(idv.getBigInt64(q+8,false));
+      const nf = idv.getUint32(q+16,false); 
+      q += 20;
+      let nm = ''; 
+      while (q < info.length && info[q]) {
+        nm += String.fromCharCode(info[q++]);
+      }
+      q++;
+      nodes.push({ off, size: sz, flags: nf, name: nm });
+    }
+
+    if (nodes.length === 0) {
+      nodes.push({ off: 0, size: uiSize || u8.length, flags: 0, name: "default_shader_node" });
+    }
+
+    return { flags, blocks, nodes, dataStart, infoOff, info, declared, ciSize, uiSize };
+  }
+
+  function parseSF(cab){
+    const dv = new DataView(cab.buffer, cab.byteOffset, cab.byteLength);
+    const dataOffset = Number(dv.getBigInt64(32, false));
+    let p = 48;
+    const cstr = () => { let s=''; while (cab[p]) s += String.fromCharCode(cab[p++]); p++; return s; };
+    cstr(); p += 5;
+    
+    const tcount = dv.getInt32(p, true); p += 4;
+    const types = [];
+    for (let i = 0; i < tcount; i++){
+      const cid = dv.getInt32(p, true); p += 21;
+      types.push({ cid });
+    }
+    
+    const ocount = dv.getInt32(p, true); p += 4;
+    const objs = [];
+    for (let i = 0; i < ocount; i++){
+      p = (p + 3) & ~3;
+      const pid = dv.getBigInt64(p, true);
+      const off = Number(dv.getBigInt64(p+8, true));
+      const size = dv.getUint32(p+16, true);
+      const tid = dv.getInt32(p+20, true);
+      p += 24;
+      
+      // Kiểm tra an toàn: Nếu tid hợp lệ mới lấy cid, ngược lại gán mặc định là 48 (Shader)
+      const cid = (types[tid] !== undefined) ? types[tid].cid : 48;
+      objs.push({ pid, off, size, tid, cid });
+    }
+    return { dataOffset, objs };
+  }
+
+
+  function decompressAll(orig, b){
+    let pos = b.dataStart, outPos = 0;
+    const parts = [], blockAt = [];
+    for (const blk of b.blocks){
+      const raw = orig.subarray(pos, pos + blk.c);
+      const ct = blk.f & 0x3F;
+      const dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+      parts.push(dec);
+      blockAt.push({ start: outPos, end: outPos + blk.u, comp: blk.c, srcOff: pos });
+      outPos += blk.u; pos += blk.c;
+    }
+    const data = new Uint8Array(outPos);
+    let w = 0; for (const p of parts){ data.set(p, w); w += p.length; }
+    return { data, blockAt };
+  }
+
+  function rebuildShadersSmartLZ4(orig, b, data, blockAt, sf, node, repl){
+    const touched = new Set();
+    for (const o of sf.objs){
+      const body = repl.get(o.pid);
+      if (!body) continue;
+      if (body.length !== o.size) {
+        throw new Error(`Object ${o.pid} thay đổi kích thước (${o.size} → ${body.length}).`);
+      }
+      const abs = node.off + sf.dataOffset + o.off;
+      data.set(body, abs);
+      for (let i = 0; i < blockAt.length; i++){
+        if (abs < blockAt[i].end && abs + body.length > blockAt[i].start) touched.add(i);
+      }
+    }
+    if (!touched.size) throw new Error('Không có thay đổi nào được ghi nhận.');
+
+    const parts = [], newBlocks = [];
+    for (let i = 0; i < b.blocks.length; i++){
+      const blk = b.blocks[i], at = blockAt[i];
+      if (!touched.has(i)){
+        parts.push(orig.subarray(at.srcOff, at.srcOff + blk.c));
+        newBlocks.push({ u: blk.u, c: blk.c, f: blk.f });
+        continue;
+      }
+      const raw = data.subarray(at.start, at.end);
+      let comp, flags = blk.f;
+      if ((blk.f & 0x3F) === 0){
+        comp = raw;
+      } else {
+        comp = lz4enc(raw);
+        if (comp.length >= raw.length){ comp = raw; flags = blk.f & ~0x3F; }
+      }
+      parts.push(comp);
+      newBlocks.push({ u: blk.u, c: comp.length, f: flags });
+    }
+
+    const info = b.info.slice();
+    const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+    let q = 20;
+    for (const nb of newBlocks){
+      idv.setUint32(q, nb.u, false);
+      idv.setUint32(q + 4, nb.c, false);
+      idv.setUint16(q + 8, nb.f, false);
+      q += 10;
+    }
+
+    let infoOut;
+    const ic = b.flags & 0x3F;
+    if (ic === 0){
+      infoOut = info;
+    } else {
+      const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
+      const root = lz4Trace(compOrig, b.uiSize);
+      const patched = compOrig.slice();
+      const want = new Map();
+      for (let i = 0; i < info.length; i++){
+        const src = root[i];
+        if (src < 0){
+          if (info[i] !== b.info[i]) throw new Error(`blocksInfo: byte ${i} không truy vết được.`);
+          continue;
+        }
+        want.set(src, info[i]);
+      }
+      for (const [src, val] of want) patched[src] = val;
+      infoOut = patched;
+    }
+
+    const dataLen = parts.reduce((a, x) => a + x.length, 0);
+    const atEnd = !!(b.flags & 0x80);
+    const headLen = atEnd ? b.dataStart : b.infoOff;
+    let core = headLen + dataLen + infoOut.length;
+    if (!atEnd && (b.flags & 0x200)) core = ((headLen + infoOut.length + 15) & ~15) + dataLen;
+    if (core > orig.length) throw new Error('Dung lượng nén phình to hơn file gốc, không đủ chỗ đệm.');
+
+    const out = new Uint8Array(orig.length);
+    if (atEnd){
+      out.set(orig.subarray(0, headLen), 0);
+      let p = headLen;
+      for (const x of parts){ out.set(x, p); p += x.length; }
+      out.set(infoOut, p);
+    } else {
+      out.set(orig.subarray(0, b.infoOff), 0);
+      out.set(infoOut, b.infoOff);
+      let p = b.infoOff + infoOut.length;
+      if (b.flags & 0x200) p = (p + 15) & ~15;
+      for (const x of parts){ out.set(x, p); p += x.length; }
+    }
+    
+    let sp = 0;
+    let tempP = 0;
+    while (out[tempP]) tempP++; tempP++; tempP += 4;
+    while (out[tempP]) tempP++; tempP++;
+    while (out[tempP]) tempP++; tempP++;
+    sp = tempP;
+
+    const odv = new DataView(out.buffer);
+    odv.setBigInt64(sp, BigInt(atEnd ? core : out.length), false);
+    odv.setUint32(sp + 8, infoOut.length, false);
+    odv.setUint32(sp + 12, info.length, false);
+    return out;
+  }
+
+  initHexColorUI();
+
+  let FILE = null, ORIG = null, BUN = null;
+
+  document.getElementById('file').addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    FILE = f;
+    ORIG = new Uint8Array(await f.arrayBuffer());
+    try {
+      BUN = parseBundle(ORIG);
+      document.getElementById('dropText').innerHTML = `<b>${f.name}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — JERRY MOD&amp; VIP</span>`;
+      document.getElementById('drop').classList.add('has');
+      document.getElementById('go').disabled = false;
+      document.getElementById('out').innerHTML = '';
+      document.getElementById('info').innerHTML = '';
+    } catch(err) {
+      document.getElementById('out').innerHTML = '';
+      document.getElementById('info').innerHTML = `<div class="msg bad">Lỗi phân tích file: ${err.message}</div>`;
+    }
+  });
+
+  document.getElementById('go').addEventListener('click', async () => {
+    const btn = document.getElementById('go');
+    btn.disabled = true; btn.textContent = 'Đang make định vị & Đóng gói LZ4...';
+    try {
+      if (!BUN || !BUN.nodes || BUN.nodes.length === 0) {
+        throw new Error('File bundle không chứa node dữ liệu hợp lệ.');
+      }
+      const node = BUN.nodes[0];
+      const { data, blockAt } = decompressAll(ORIG, BUN);
+      const cab = data.subarray(node.off, node.off + node.size);
+      const sf = parseSF(cab);
+      const repl = new Map();
+      let count = 0;
+
+      for (const targetQuery of AUTO_CONFIG.targetPathIDs){
+        const targetObj = sf.objs.find(o => o.cid === 48 && o.pid.toString() === targetQuery);
+        if (!targetObj) continue;
+        
+        let injectedBytes = new Uint8Array(targetObj.size);
+        if (baseShaderBody.length >= targetObj.size) {
+          injectedBytes.set(baseShaderBody.subarray(0, targetObj.size));
+        } else {
+          injectedBytes.set(baseShaderBody);
+        }
+        
+        repl.set(targetObj.pid, injectedBytes);
+        count++;
+      }
+
+      if (count === 0) throw new Error('Không tìm thấy PathID Shader mục tiêu phù hợp trong file này.');
+
+      const finalOut = rebuildShadersSmartLZ4(ORIG, BUN, data, blockAt, sf, node, repl);
+
+      document.getElementById('out').innerHTML = `
+        <div class="panel">
+          <div class="msg ok">Make định vị súng và <b>VÀ TỐI ƯU FILE thông minh thành công</b>!  ${count} Jerry Mod.</div>
+          <h2>Tải xuống</h2>
+          <span class="fname">${FILE.name}</span>
+          <div class="row" style="margin-top:10px"><button id="dl">Tải file hoàn chỉnh</button></div>
+        </div>`;
+
+      document.getElementById('dl').onclick = () => {
+        const url = URL.createObjectURL(new Blob([finalOut], { type: 'application/octet-stream' }));
+        const a = document.createElement('a'); a.href = url; a.download = FILE.name;
+        a.click(); URL.revokeObjectURL(url);
+      };
+    } catch(err) {
+      document.getElementById('out').innerHTML = `<div class="msg bad">Lỗi thực thi: ${err.message}</div>`;
+    } finally {
+      btn.disabled = false; btn.textContent = 'CHẠY LỆNH ';
+    }
+  });
+
+  const drop = document.getElementById('drop'), input = document.getElementById('file');
+  drop.onclick = () => input.click();
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('has'); });
+  drop.addEventListener('dragleave', e => { e.preventDefault(); drop.classList.remove('has'); });
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) {
+      input.files = e.dataTransfer.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
