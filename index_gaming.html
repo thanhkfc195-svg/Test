@@ -1,0 +1,1527 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jerry Mod Studio — Gaming Edition</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#fff; --ink:#14171c; --muted:#5d6673; --line:#dfe3e9;
+    --accent:#2f6fed; --ok:#12805c; --warn:#9a5b00; --bad:#c0392b;
+    --chip:#eef1f6; --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1216; --panel:#171b21; --ink:#e7eaef; --muted:#98a2b3; --line:#282e37;
+      --accent:#6f9cf7; --ok:#3ecf9a; --warn:#e3a648; --bad:#f0715f; --chip:#222833;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1216; --panel:#171b21; --ink:#e7eaef; --muted:#98a2b3; --line:#282e37;
+    --accent:#6f9cf7; --ok:#3ecf9a; --warn:#e3a648; --bad:#f0715f; --chip:#222833;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+       padding:28px 20px 60px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:21px;margin:0 0 4px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 22px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+
+  #drop{border:1.5px dashed var(--line);border-radius:12px;padding:30px 20px;text-align:center;
+        cursor:pointer;transition:.15s;background:var(--panel);margin-bottom:16px}
+  #drop:hover,#drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--panel))}
+  #drop b{display:block;font-size:15px;margin-bottom:5px}
+  #drop span{color:var(--muted);font-size:13px}
+  #drop.has{padding:18px 20px;border-style:solid}
+
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+     margin:0 0 12px;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  td{padding:5px 0;vertical-align:top}
+  td:first-child{color:var(--muted);width:180px;padding-right:14px;white-space:nowrap}
+  td:last-child{font-family:var(--mono);font-size:12.5px;word-break:break-all}
+
+  .hexwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.hex{font-family:var(--mono);font-size:12px;white-space:nowrap;width:auto;min-width:100%}
+  table.hex th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;
+               text-transform:uppercase;letter-spacing:.05em;padding:0 16px 7px 0;border-bottom:1px solid var(--line)}
+  table.hex td{padding:6px 16px 6px 0;border-bottom:1px solid var(--line);width:auto;color:var(--ink)}
+  table.hex td:first-child{width:auto;color:var(--muted)}
+  table.hex tr:last-child td{border-bottom:0}
+  .old{color:var(--bad)} .new{color:var(--ok)} .dim{color:var(--muted)}
+
+  .presets{display:grid;gap:10px;margin-bottom:16px}
+  .pre{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:11px;
+       padding:14px 16px;cursor:pointer;background:var(--panel);transition:.13s}
+  .pre:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  .pre.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--panel))}
+  .off{display:none !important}
+  .pre input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+  .pre .t{font-weight:600;font-size:14.5px;margin-bottom:3px}
+  .pre .d{color:var(--muted);font-size:12.5px;line-height:1.5}
+  .pre .n{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px}
+
+  .msg{border-radius:9px;padding:11px 14px;font-size:13.5px;margin-bottom:14px;border:1px solid}
+  .msg.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);
+          background:color-mix(in srgb,var(--ok) 9%,transparent)}
+  .msg.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,transparent);
+           background:color-mix(in srgb,var(--bad) 9%,transparent)}
+  .msg.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);
+            background:color-mix(in srgb,var(--warn) 9%,transparent)}
+
+  button{font:inherit;font-size:14px;font-weight:500;border:0;border-radius:9px;padding:11px 20px;
+         background:var(--accent);color:#fff;cursor:pointer}
+  button:hover:not(:disabled){filter:brightness(1.07)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .hide{display:none}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--chip);padding:1px 5px;border-radius:4px}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px;line-height:1.5}
+  .fname{font-family:var(--mono);font-size:12.5px;background:var(--chip);padding:8px 10px;
+         border-radius:7px;word-break:break-all;margin-top:6px;display:block}
+  .adv{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .adv summary{cursor:pointer;color:var(--muted);font-size:12.5px;user-select:none}
+  .flds{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+  .fld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:4px}
+  .fld input{width:100%;font:inherit;font-family:var(--mono);font-size:13px;padding:7px 9px;
+             border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink)}
+
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:12px}
+  .cfld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px}
+  .cfld label .dim{font-family:var(--mono);font-size:11px}
+  .crow{display:flex;gap:8px;align-items:center}
+  .crow input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--line);
+                          border-radius:7px;background:var(--bg);cursor:pointer;flex:none}
+  .crow input[type=text]{flex:1;min-width:0;font:inherit;font-family:var(--mono);font-size:13px;
+                         padding:8px 9px;border:1px solid var(--line);border-radius:7px;
+                         background:var(--bg);color:var(--ink);text-transform:uppercase}
+  .crow input[type=text].bad{border-color:var(--bad)}
+  .wfld,.afld{margin-top:16px}
+  .wfld label,.afld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:7px}
+  .wfld label b,.afld label b{color:var(--ink);font-family:var(--mono)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;
+          margin-right:6px;border:1px solid rgba(128,128,128,.45)}
+  .fxrow{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+  .chk{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13.5px}
+  .chk input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;flex:none}
+  .chk .dim{color:var(--muted);font-family:var(--mono);font-size:11.5px}
+
+  .hidden{display:none!important}.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.mode{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:12px;cursor:pointer;background:var(--bg)}.mode.active{border-color:var(--accent)}.mode input{accent-color:var(--accent);margin-top:3px}.mode b,.mode small{display:block}.mode small{color:var(--dim);font-size:12px;margin-top:3px}.file-pick{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:500;padding:10px 16px;border-radius:6px;border:1px solid var(--accent-dim);background:var(--accent);color:#08130d;cursor:pointer}.file-pick.secondary{background:transparent;color:var(--accent);border-color:var(--accent-dim)}.secondary-btn{background:transparent;color:var(--accent);border:1px solid var(--accent-dim)}.field-label{display:block;color:var(--dim);font-family:var(--mono);font-size:12px;margin:12px 0 6px}textarea{width:100%;resize:vertical;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);padding:10px;font:13px/1.5 var(--mono)}
+  .status-line{font-family:var(--mono);font-size:13px;color:var(--accent);padding:10px;border:1px solid var(--line);border-radius:7px;background:var(--bg)}
+  .result-detail{display:none!important}
+  .color-grid,.alpha-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}.color-item{display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:10px}.color-item label,.alpha-grid label{font:12px var(--mono);color:var(--dim)}.color-item input[type=color]{width:100%;height:34px;border:0;background:transparent;cursor:pointer}.color-item span{font:11px var(--mono);color:var(--dim)}.alpha-grid{margin-top:14px}.alpha-grid label{display:block}.alpha-grid b{float:right;color:var(--text)}.alpha-grid input{display:block;width:100%;margin-top:8px}
+
+/* ===== Gaming UI upgrade ===== */
+:root{
+  --bg:#070a12;--panel:#0d1322;--ink:#eaf7ff;--muted:#8fa9c2;--line:#203653;
+  --accent:#35e7ff;--accent2:#a855f7;--ok:#4dffb1;--warn:#ffd166;--bad:#ff5577;
+  --chip:#111d31;--glow:0 0 24px rgba(53,231,255,.16);--radius:16px;
+}
+*{box-sizing:border-box}
+html{background:#070a12}
+body{min-height:100vh;background:radial-gradient(circle at 12% 0%,rgba(53,231,255,.12),transparent 30%),radial-gradient(circle at 90% 8%,rgba(168,85,247,.15),transparent 34%),linear-gradient(135deg,#070a12,#0a1020 52%,#0b0818);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;padding:34px 18px 90px;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(53,231,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(53,231,255,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 82%);z-index:-1}
+.wrap{max-width:940px;margin:0 auto}
+header{position:relative;padding:12px 4px 26px;text-align:center}
+header:after{content:"";display:block;width:120px;height:3px;margin:16px auto 0;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);box-shadow:0 0 16px var(--accent)}
+.eyebrow{color:var(--accent);font:700 11px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;text-shadow:0 0 12px rgba(53,231,255,.7)}
+h1{font-size:clamp(27px,5vw,45px);letter-spacing:.08em;line-height:1.05;margin:12px 0 10px;color:#fff;text-shadow:0 0 18px rgba(53,231,255,.35)}
+h1 span{color:var(--accent);background:linear-gradient(90deg,var(--accent),#fff,var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:#b5cbe0;font-size:13px;line-height:1.7;margin:0 auto;max-width:680px}
+.panel{background:linear-gradient(145deg,rgba(17,29,49,.94),rgba(10,16,30,.96));border:1px solid rgba(53,231,255,.22);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--glow),inset 0 1px rgba(255,255,255,.04);position:relative;overflow:hidden}
+.panel:before{content:"";position:absolute;left:0;top:0;width:34%;height:2px;background:linear-gradient(90deg,var(--accent),transparent);box-shadow:0 0 13px var(--accent)}
+h2{color:var(--accent);font-size:12px;letter-spacing:.15em;font-weight:800;text-shadow:0 0 10px rgba(53,231,255,.4)}
+label,.note,.sub,.fname,td,th,.mode small,.field-label,.color-item span{color:#b9d0e5}
+code{color:#ffd166;background:#14243a;border:1px solid rgba(255,209,102,.18)}
+.mode{background:rgba(9,17,33,.8);border-color:#244363;transition:border-color .15s,transform .15s,box-shadow .15s}.mode:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 0 18px rgba(53,231,255,.16)}.mode.active{border-color:var(--accent);background:linear-gradient(135deg,rgba(53,231,255,.12),rgba(168,85,247,.1));box-shadow:0 0 20px rgba(53,231,255,.12)}.mode b{color:#fff}.mode small{color:#9eb8ce}
+input[type=color]{border:1px solid #376286!important;background:#0b1426!important;box-shadow:0 0 10px rgba(53,231,255,.12)}
+input[type=range]{accent-color:var(--accent)}
+.fname{background:#0a1426;border:1px solid #1d3856;color:#a8c5dc}
+button{background:linear-gradient(100deg,#18bcd9,var(--accent2));color:#fff;border:1px solid rgba(255,255,255,.25);font-weight:800;letter-spacing:.04em;box-shadow:0 0 18px rgba(53,231,255,.2);transition:transform .15s,filter .15s,box-shadow .15s}button:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px);box-shadow:0 0 26px rgba(168,85,247,.35)}button:disabled{background:#26364b;color:#8294a8;box-shadow:none}
+.msg.ok{color:var(--ok);background:rgba(77,255,177,.08)}.msg.warn{color:var(--warn);background:rgba(255,209,102,.08)}.msg.bad{color:var(--bad);background:rgba(255,85,119,.08)}
+.zalo-btn{position:fixed;right:22px;bottom:22px;z-index:20;display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:999px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#0068ff,#00b8ff);border:1px solid rgba(255,255,255,.55);font-weight:800;letter-spacing:.03em;box-shadow:0 8px 28px rgba(0,104,255,.42),0 0 0 4px rgba(0,184,255,.08);transition:transform .16s,box-shadow .16s}.zalo-btn:before{content:"Z";display:grid;place-items:center;width:24px;height:24px;border:2px solid #fff;border-radius:50%;font-size:14px}.zalo-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 34px rgba(0,104,255,.58),0 0 0 5px rgba(0,184,255,.12)}
+@media (max-width:600px){body{padding:22px 12px 88px}.panel{padding:16px;border-radius:13px}.zalo-btn{right:14px;bottom:14px;padding:11px 15px;font-size:13px}h1{letter-spacing:.04em}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">JERRY MOD STUDIO</div>
+    <h1>ĐỊNH VỊ <span>SÚNG & NHÂN VẬT</span></h1>
+    <p class="sub">Tool Make Màu Tự Động Cho 3105 & Filza ios Cao Tiện Lợi
+    </p>
+  </header>
+
+<a class="zalo-btn" href="https://zalo.me/0559376085" target="_blank" rel="noopener noreferrer" aria-label="Liên hệ qua Zalo">Liên hệ Zalo</a>
+
+  <section class="panel">
+    <h2>1. Chọn file bundle</h2>
+    <label class="file-pick" for="file">Chọn file bundle</label>
+    <input type="file" id="file" accept="*/*">
+    <div id="fileName" class="fname">Chưa chọn file</div>
+    <div id="info"></div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Chọn chức năng</h2>
+    <div class="mode-grid">
+      <label class="mode active"><input type="radio" name="mode" value="gun" checked><span><b>Định vị súng</b><small>Định Vị Súng 2 Lớp Tích Hợp Keo Trong Xuất</small></span></label>
+      <label class="mode"><input type="radio" name="mode" value="character"><span><b>Định vị nhân vật</b><small>Make Màu Tự Động Và Dạng Định Vị Neww</small></span></label>
+    </div>
+  </section>
+
+  <section class="panel mode-panel" id="gunPanel">
+    <h2>Định vị súng</h2>
+    <p class="note">Công Cụ Chỉnh Sửa Màu Định Vị Súng <code>Và Keo Trong Xuất</code>, <code>Tool Make Màu Tự Động</code> và <code>Antiban</code>.</p>
+    <div class="config-grid">
+      <div class="config-item"><label for="cXray">Màu súng</label><input type="color" id="cXray" value="#111111"></div>
+      <div class="config-item"><label for="cLine">Màu viền</label><input type="color" id="cLine" value="#ffffff"></div>
+      <div class="config-item"><label for="cDim">Màu keo</label><input type="color" id="cDim" value="#111111"></div>
+    </div>
+    <label class="field-label" for="rWidth">Độ dày viền: <b id="wVal">4.0</b></label>
+    <input type="range" id="rWidth" min="0" max="20" step="0.5" value="4">
+    <label class="field-label" for="rAlpha">Độ đục màu súng: <b id="aVal">1.00</b></label>
+    <input type="range" id="rAlpha" min="0" max="1" step="0.05" value="1">
+  </section>
+
+  <section class="panel mode-panel hidden" id="characterPanel">
+    <h2>Định vị nhân vật</h2>
+    <p class="note">Cấu hình định vị nhân vật đã được tích hợp sẵn. Chọn Màu Theo Sở Thích, Tích Hợp Antiban</p>
+    <div class="color-grid">
+      <div class="color-item"><label for="chTint">Màu nhân vật</label><input type="color" id="chTint" value="#0080ff"><span id="chTintVal">#0080FF</span></div>
+      <div class="color-item"><label for="chRim">Màu sáng mép</label><input type="color" id="chRim" value="#00ffff"><span id="chRimVal">#00FFFF</span></div>
+      <div class="color-item"><label for="chScan">Màu quét</label><input type="color" id="chScan" value="#00ffff"><span id="chScanVal">#00FFFF</span></div>
+    </div>
+    <div class="alpha-grid">
+      <label>Đục màu nhân vật <b id="chTintAVal">1.00</b><input type="range" id="chTintA" min="0" max="1" step="0.05" value="1"></label>
+      <label>Độ mạnh sáng mép <b id="chRimAVal">1.00</b><input type="range" id="chRimA" min="0" max="1" step="0.05" value="1"></label>
+      <label>Độ mạnh màu quét <b id="chScanAVal">0.50</b><input type="range" id="chScanA" min="0" max="1" step="0.05" value="0.5"></label>
+    </div>
+  </section>
+
+  <section class="panel"><button id="go" disabled>Tạo file</button></section>
+  <div id="out"></div>
+</div>
+<script>
+/* ═══════════ tiện ích ═══════════ */
+const $ = s => document.querySelector(s);
+const hx = n => n.toString(16);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const a4 = n => (n + 3) & ~3;
+
+const CRC_TAB = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+const crc32 = b => {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < b.length; i++) c = CRC_TAB[(c ^ b[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+};
+const enc = s => new TextEncoder().encode(s);
+
+/* ═══════════ LZ4 ═══════════ */
+function lz4dec(src, outSize){
+  const dst = new Uint8Array(outSize);
+  const n = src.length;
+  let i = 0, o = 0;
+  while (i < n){
+    const tok = src[i++];
+
+    let lit = tok >> 4;
+    if (lit === 15){
+      let b;
+      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài literal'); b = src[i++]; lit += b; }
+      while (b === 255);
+    }
+    if (lit){
+      if (i + lit > n) throw new Error('LZ4: literal vượt biên');
+      if (o + lit > outSize) throw new Error('LZ4: literal vượt kích thước đầu ra');
+      dst.set(src.subarray(i, i + lit), o);
+      i += lit; o += lit;
+    }
+
+    /* token cuối chỉ có literal, không kèm match */
+    if (i >= n) break;
+
+    const off = src[i] | (src[i+1] << 8); i += 2;
+    if (off === 0 || off > o) throw new Error(`LZ4: offset không hợp lệ (${off})`);
+    let ml = tok & 15;
+    if (ml === 15){
+      let b;
+      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài match'); b = src[i++]; ml += b; }
+      while (b === 255);
+    }
+    ml += 4;
+    if (o + ml > outSize) throw new Error('LZ4: match vượt kích thước đầu ra');
+    /* copy từng byte — vùng match có thể chồng lấn khi off < ml */
+    let sp = o - off;
+    for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
+  }
+  if (o !== outSize) throw new Error(`LZ4: giải ra ${o} byte, cần ${outSize}`);
+  return dst;
+}
+
+/* Nén LZ4 block (greedy hash-chain). Tỉ lệ kém LZ4HC vài phần trăm nhưng
+   đủ dùng để đóng gói lại block đã sửa. */
+function lz4enc(src){
+  const n = src.length;
+  if (!n) return new Uint8Array(0);
+  const out = [];
+  const HLOG = 16, HSIZE = 1 << HLOG;
+  const head = new Int32Array(HSIZE).fill(-1);
+  const prev = new Int32Array(n).fill(-1);
+  const MFLIMIT = 12, LASTLIT = 5, MAXDIST = 65535, CHAIN = 32;
+
+  const h4 = i => {
+    const v = (src[i] | (src[i+1]<<8) | (src[i+2]<<16) | (src[i+3]<<24)) >>> 0;
+    return (Math.imul(v, 2654435761) >>> (32 - HLOG));
+  };
+  const same4 = (a, b) =>
+    src[a]===src[b] && src[a+1]===src[b+1] && src[a+2]===src[b+2] && src[a+3]===src[b+3];
+
+  const emit = (ls, le, mlen, moff) => {
+    const litlen = le - ls;
+    const ml = mlen ? mlen - 4 : 0;
+    out.push(((litlen >= 15 ? 15 : litlen) << 4) | (ml >= 15 ? 15 : ml));
+    if (litlen >= 15){
+      let r = litlen - 15;
+      while (r >= 255){ out.push(255); r -= 255; }
+      out.push(r);
+    }
+    for (let k = ls; k < le; k++) out.push(src[k]);
+    if (mlen){
+      out.push(moff & 255, (moff >> 8) & 255);
+      if (ml >= 15){
+        let r = ml - 15;
+        while (r >= 255){ out.push(255); r -= 255; }
+        out.push(r);
+      }
+    }
+  };
+
+  let anchor = 0, i = 0;
+  while (i < n - MFLIMIT){
+    const hv = h4(i);
+    let bestLen = 0, bestOff = 0, cur = head[hv], cnt = 0;
+    while (cur >= 0 && cnt < CHAIN){
+      const off = i - cur;
+      if (off > MAXDIST) break;
+      if (same4(cur, i)){
+        let l = 4;
+        const lim = n - LASTLIT - i;
+        while (l < lim && src[cur+l] === src[i+l]) l++;
+        if (l > bestLen){ bestLen = l; bestOff = off; if (l >= 255) break; }
+      }
+      cur = prev[cur]; cnt++;
+    }
+    prev[i] = head[hv]; head[hv] = i;
+
+    if (bestLen >= 4){
+      emit(anchor, i, bestLen, bestOff);
+      const stop = Math.min(i + bestLen, n - 3);
+      for (let k = i + 1; k < stop; k++){ const hk = h4(k); prev[k] = head[hk]; head[hk] = k; }
+      i += bestLen; anchor = i;
+    } else i++;
+  }
+  const litlen = n - anchor;
+  out.push((litlen >= 15 ? 15 : litlen) << 4);
+  if (litlen >= 15){
+    let r = litlen - 15;
+    while (r >= 255){ out.push(255); r -= 255; }
+    out.push(r);
+  }
+  for (let k = anchor; k < n; k++) out.push(src[k]);
+  return new Uint8Array(out);
+}
+
+/* Truy vết nguồn gốc từng byte của kết quả giải nén.
+   - literal  → { src: offset trong luồng nén }
+   - match    → { from: vị trí byte đầu ra mà nó sao chép lại }
+   Nhờ đó biết được sửa byte nào trong luồng nén để đổi byte đầu ra mong muốn. */
+function lz4Trace(src, outSize){
+  const litOf  = new Int32Array(outSize).fill(-1);
+  const copyOf = new Int32Array(outSize).fill(-1);
+  let i = 0, o = 0;
+  while (i < src.length && o < outSize){
+    const tok = src[i++];
+    let lit = tok >> 4;
+    if (lit === 15){ let b; do { b = src[i++]; lit += b; } while (b === 255); }
+    for (let k = 0; k < lit; k++){ litOf[o++] = i++; }
+    if (i >= src.length) break;
+    const off = src[i] | (src[i+1] << 8); i += 2;
+    let ml = tok & 15;
+    if (ml === 15){ let b; do { b = src[i++]; ml += b; } while (b === 255); }
+    ml += 4;
+    let sp = o - off;
+    for (let k = 0; k < ml; k++){ copyOf[o] = sp; o++; sp++; }
+  }
+  /* Lần về gốc: byte match nào cuối cùng cũng bắt nguồn từ một literal. */
+  const root = new Int32Array(outSize).fill(-1);
+  for (let k = 0; k < outSize; k++){
+    let cur = k, guard = 0;
+    while (litOf[cur] < 0 && copyOf[cur] >= 0 && guard++ < outSize) cur = copyOf[cur];
+    root[k] = litOf[cur] >= 0 ? litOf[cur] : -1;
+  }
+  return root;
+}
+
+/* ═══════════ UnityFS ═══════════ */
+function parseBundle(u8){
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let p = 0;
+  const cstr = () => { let s = ''; while (u8[p]) s += String.fromCharCode(u8[p++]); p++; return s; };
+
+  const sig = cstr();
+  if (sig !== 'UnityFS') throw new Error(`Không phải UnityFS bundle (signature "${sig}")`);
+  const fmt = dv.getUint32(p, false); p += 4;
+  const uv = cstr(), rev = cstr();
+  const declared = Number(dv.getBigInt64(p, false)); p += 8;
+  const ciSize = dv.getUint32(p, false); p += 4;
+  const uiSize = dv.getUint32(p, false); p += 4;
+  const flags  = dv.getUint32(p, false); p += 4;
+  const headerEnd = p;
+  const ic = flags & 0x3F;
+
+  let infoOff, info, dataStart;
+  if (flags & 0x80){
+    /* blocksInfoAtTheEnd: blocksInfo nằm cuối phần dữ liệu thực dùng.
+       Trường size có thể sai (file còn đuôi thừa) nên dò ngược để tìm.
+       Vùng dữ liệu vẫn căn lề 16 sau header, kể cả khi cờ 0x200 không bật. */
+    dataStart = (headerEnd + 15) & ~15;
+    infoOff = null;
+    const from = Math.min(declared, u8.length) - ciSize;
+    for (let off = from; off >= Math.max(0, from - 80000); off--){
+      try {
+        const cand = (ic === 2 || ic === 3)
+          ? lz4dec(u8.subarray(off, off + ciSize), uiSize)
+          : u8.subarray(off, off + ciSize).slice();
+        info = cand; infoOff = off; break;
+      } catch (e) { /* thử vị trí trước đó */ }
+    }
+    if (infoOff === null) throw new Error('Không tìm được blocksInfo ở cuối file.');
+  } else {
+    if (fmt >= 7 || (flags & 0x200)) p = (p + 15) & ~15;
+    infoOff = p;
+    const infoRaw = u8.subarray(p, p + ciSize);
+    if (ic === 2 || ic === 3) info = lz4dec(infoRaw, uiSize);
+    else if (ic === 0) info = infoRaw.slice();
+    else throw new Error(`blocksInfo nén kiểu ${ic} (chưa hỗ trợ)`);
+    /* sau blocksInfo còn căn lề 16 trước khi vào vùng dữ liệu */
+    dataStart = infoOff + ciSize;
+    if (flags & 0x200) dataStart = (dataStart + 15) & ~15;
+  }
+
+  const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+  let q = 16;
+  const nB = idv.getUint32(q, false); q += 4;
+  const blocks = [];
+  for (let i = 0; i < nB; i++){
+    blocks.push({ u: idv.getUint32(q,false), c: idv.getUint32(q+4,false), f: idv.getUint16(q+8,false) });
+    q += 10;
+  }
+  const nN = idv.getUint32(q, false); q += 4;
+  const nodes = [];
+  for (let i = 0; i < nN; i++){
+    const off = Number(idv.getBigInt64(q,false)), sz = Number(idv.getBigInt64(q+8,false));
+    const nf = idv.getUint32(q+16,false); q += 20;
+    let nm = ''; while (info[q]) nm += String.fromCharCode(info[q++]); q++;
+    nodes.push({ off, size: sz, flags: nf, name: nm });
+  }
+  return { fmt, uv, rev, declared, ciSize, uiSize, flags, blocks, nodes,
+           dataStart, infoOff, info, headerEnd };
+}
+
+/* ═══════════ SerializedFile ═══════════ */
+function parseSF(cab){
+  const dv = new DataView(cab.buffer, cab.byteOffset, cab.byteLength);
+  const version = dv.getUint32(8, false);
+  if (version !== 22) throw new Error(`SerializedFile v${version} (tool chỉ hỗ trợ v22)`);
+  const metaSize = dv.getUint32(20, false);
+  const fileSize = Number(dv.getBigInt64(24, false));
+  const dataOffset = Number(dv.getBigInt64(32, false));
+
+  let p = 48;
+  const cstr = () => { let s=''; while (cab[p]) s += String.fromCharCode(cab[p++]); p++; return s; };
+  const unityVer = cstr();
+  const target = dv.getInt32(p, true); p += 4;
+  const hasTT = cab[p]; p += 1;
+
+  const i32 = () => { const v = dv.getInt32(p, true); p += 4; return v; };
+  const u32 = () => { const v = dv.getUint32(p, true); p += 4; return v; };
+
+  const tcount = i32();
+  const types = [];
+  for (let i = 0; i < tcount; i++){
+    const cid = i32();
+    p += 1;                              // stripped
+    p += 2;                              // scriptTypeIndex
+    if (cid === 114) p += 16;            // scriptHash
+    const th = cab.slice(p, p+16); p += 16;
+    let nodes = null, sb = null;
+    if (hasTT){
+      const nn = i32(), sbs = i32();
+      nodes = [];
+      for (let k = 0; k < nn; k++){
+        const ver = dv.getUint16(p, true);
+        const level = cab[p+2], tflags = cab[p+3];
+        const to = dv.getUint32(p+4, true), no = dv.getUint32(p+8, true);
+        const bsize = dv.getInt32(p+12, true), idx = dv.getInt32(p+16, true), meta = dv.getInt32(p+20, true);
+        p += 32;
+        nodes.push({ ver, level, tflags, to, no, bsize, idx, meta });
+      }
+      sb = cab.slice(p, p + sbs); p += sbs;
+      const nd = i32(); p += nd * 4;     // typeDependencies
+    }
+    types.push({ cid, th, nodes, sb });
+  }
+
+  const ocount = i32();
+  const objs = [];
+  for (let i = 0; i < ocount; i++){
+    p = a4(p);
+    const ent = p;
+    const pid = dv.getBigInt64(p, true);
+    const off = Number(dv.getBigInt64(p+8, true));
+    const size = dv.getUint32(p+16, true);
+    const tid = dv.getInt32(p+20, true);
+    p += 24;
+    objs.push({ pid, off, size, tid, cid: types[tid].cid, ent });
+  }
+  return { version, metaSize, fileSize, dataOffset, unityVer, target, hasTT, types, objs, cab };
+}
+
+/* ═══════════ typetree reader ═══════════ */
+const COMMON = "AABB\0AnimationClip\0AnimationCurve\0AnimationState\0Array\0Base\0BitField\0bitset\0bool\0char\0ColorRGBA\0Component\0data\0deque\0double\0dynamic_array\0FastPropertyName\0first\0float\0Font\0GameObject\0Generic Mono\0GradientNEW\0GUID\0GUIStyle\0int\0list\0long long\0map\0Matrix4x4f\0MdFour\0MonoBehaviour\0MonoScript\0m_ByteSize\0m_Curve\0m_EditorClassIdentifier\0m_EditorHideFlags\0m_Enabled\0m_ExtensionPtr\0m_GameObject\0m_Index\0m_IsArray\0m_IsStatic\0m_MetaFlag\0m_Name\0m_ObjectHideFlags\0m_PrefabInternal\0m_PrefabParentObject\0m_Script\0m_StaticEditorFlags\0m_Type\0m_Version\0Object\0pair\0PPtr<Component>\0PPtr<GameObject>\0PPtr<Material>\0PPtr<MonoBehaviour>\0PPtr<MonoScript>\0PPtr<Object>\0PPtr<Prefab>\0PPtr<Sprite>\0PPtr<TextAsset>\0PPtr<Texture>\0PPtr<Texture2D>\0PPtr<Transform>\0Prefab\0Quaternionf\0Rectf\0RectInt\0RectOffset\0second\0set\0short\0size\0SInt16\0SInt32\0SInt64\0SInt8\0staticvector\0string\0TextAsset\0TextMesh\0Texture\0Texture2D\0Transform\0TypelessData\0UInt16\0UInt32\0UInt64\0UInt8\0unsigned int\0unsigned long long\0unsigned short\0vector\0Vector2f\0Vector3f\0Vector4f\0m_ScriptingClassIdentifier\0Gradient\0Type*\0int2_storage\0int3_storage\0BoundsInt\0m_CorrespondingSourceObject\0m_PrefabInstance\0m_PrefabAsset\0FileSize\0Hash128\0";
+const COMMON_B = enc(COMMON);
+
+function sname(sb, off){
+  const buf = (off & 0x80000000) ? COMMON_B : sb;
+  let o = off & 0x7fffffff, s = '';
+  while (buf[o]) s += String.fromCharCode(buf[o++]);
+  return s;
+}
+function buildNodes(t){
+  return t.nodes.map(n => ({
+    type: sname(t.sb, n.to), name: sname(t.sb, n.no),
+    level: n.level, meta: n.meta
+  }));
+}
+
+/* Đọc giá trị theo typetree; ghi lại offset của mọi chuỗi vào trace */
+function makeReader(data){
+  const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  return { data, dv, p: 0, align(){ this.p = a4(this.p); } };
+}
+function readVal(nodes, i, r, trace){
+  const n = nodes[i];
+  const t = n.type;
+  const doAlign = (n.meta & 0x4000) !== 0;
+  const kids = [];
+  let j = i + 1;
+  while (j < nodes.length && nodes[j].level > n.level){
+    if (nodes[j].level === n.level + 1) kids.push(j);
+    j++;
+  }
+  let v;
+  switch (t){
+    case 'SInt8':  v = r.dv.getInt8(r.p);  r.p += 1; break;
+    case 'UInt8': case 'char': v = r.data[r.p]; r.p += 1; break;
+    case 'SInt16': case 'short': v = r.dv.getInt16(r.p,true); r.p += 2; break;
+    case 'UInt16': case 'unsigned short': v = r.dv.getUint16(r.p,true); r.p += 2; break;
+    case 'SInt32': case 'int': case 'Type*': v = r.dv.getInt32(r.p,true); r.p += 4; break;
+    case 'UInt32': case 'unsigned int': v = r.dv.getUint32(r.p,true); r.p += 4; break;
+    case 'SInt64': case 'long long': v = r.dv.getBigInt64(r.p,true); r.p += 8; break;
+    case 'UInt64': case 'unsigned long long': case 'FileSize':
+      v = r.dv.getBigUint64(r.p,true); r.p += 8; break;
+    case 'float':  v = r.dv.getFloat32(r.p,true); r.p += 4; break;
+    case 'double': v = r.dv.getFloat64(r.p,true); r.p += 8; break;
+    case 'bool':   v = r.data[r.p] !== 0; r.p += 1; break;
+    case 'string': {
+      const st = r.p;
+      const ln = r.dv.getInt32(r.p,true); r.p += 4;
+      v = new TextDecoder().decode(r.data.subarray(r.p, r.p+ln)); r.p += ln;
+      r.align();
+      if (trace) trace.push({ node: n.name, start: st, len: ln, val: v });
+      break;
+    }
+    case 'TypelessData': {
+      const ln = r.dv.getInt32(r.p,true); r.p += 4;
+      v = r.data.slice(r.p, r.p+ln); r.p += ln;
+      break;
+    }
+    default: {
+      if (kids.length && nodes[kids[0]].type === 'Array'){
+        const ai = kids[0];
+        const ak = [];
+        let k = ai + 1;
+        while (k < nodes.length && nodes[k].level > nodes[ai].level){
+          if (nodes[k].level === nodes[ai].level + 1) ak.push(k);
+          k++;
+        }
+        const size = r.dv.getInt32(r.p,true); r.p += 4;
+        v = [];
+        for (let m = 0; m < size; m++) v.push(readVal(nodes, ak[1], r, trace));
+        if (nodes[ai].meta & 0x4000) r.align();
+      } else {
+        v = {};
+        for (const c of kids) v[nodes[c].name] = readVal(nodes, c, r, trace);
+      }
+    }
+  }
+  if (doAlign) r.align();
+  return v;
+}
+
+function objBody(sf, o){ return sf.cab.subarray(sf.dataOffset + o.off, sf.dataOffset + o.off + o.size); }
+function readObj(sf, o, trace){
+  const nodes = buildNodes(sf.types[o.tid]);
+  const r = makeReader(objBody(sf, o));
+  const v = readVal(nodes, 0, r, trace);
+  return v;
+}
+
+/* ═══════════ PRESET 1: tráo bone_Hips ⇄ bone_Neck ═══════════ */
+const HIPS = enc('bone_Hips'), NECK = enc('bone_Neck');
+const H_HIPS = crc32(HIPS), H_NECK = crc32(NECK);
+
+function findSwapTargets(u8, from, to){
+  const hits = [];
+  const want = [
+    { nm: HIPS, lb:'bone_Hips', h: H_HIPS, ot: NECK, ol:'bone_Neck', cons:true  },
+    { nm: NECK, lb:'bone_Neck', h: H_NECK, ot: HIPS, ol:'bone_Hips', cons:true  },
+    { nm: HIPS, lb:'bone_Hips', h: H_NECK, ot: NECK, ol:'bone_Neck', cons:false },
+    { nm: NECK, lb:'bone_Neck', h: H_HIPS, ot: HIPS, ol:'bone_Hips', cons:false }
+  ];
+  for (const w of want){
+    const pat = new Uint8Array(20);
+    const pv = new DataView(pat.buffer);
+    pv.setInt32(0, 9, true);
+    pat.set(w.nm, 4);
+    pv.setUint32(16, w.h, true);
+    for (let i = from; i <= to - 20; i++){
+      let ok = true;
+      for (let k = 0; k < 20; k++) if (u8[i+k] !== pat[k]) { ok = false; break; }
+      if (ok) hits.push({ at: i + 4, ...w });
+    }
+  }
+  return hits.sort((a,b) => a.at - b.at);
+}
+
+function applyPreset1(orig, b){
+  const node = b.nodes[0];
+  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
+    throw new Error('Bundle có block bị nén — preset 1 chỉ sửa được bundle lưu thô.');
+  const from = b.dataStart + node.off, to = from + node.size;
+  const hits = findSwapTargets(orig, from, to);
+  if (!hits.length) throw new Error('Không tìm thấy cặp bone_Hips / bone_Neck nào trong file này.');
+  const out = orig.slice();
+  for (const h of hits) out.set(h.ot, h.at);
+  const rows = hits.map(h => [`0x${hx(h.at).padStart(5,'0')}`, String(h.h), h.lb, h.ol]);
+  const st = hits.every(h => h.cons) ? 'nguyên bản'
+           : hits.every(h => !h.cons) ? 'đã hoán đổi' : 'lẫn lộn';
+  return {
+    out,
+    note: `Tìm thấy <b>${hits.length}</b> mục tiêu (trạng thái trước đó: <b>${st}</b>) — hoán đổi ${hits.length*4} byte.`,
+    cols: ['Offset','Hash (CRC32)','Trước','Sau'], rows
+  };
+}
+
+/* ═══════════ PRESET 2: bone_Head giả + indexer 12 mục ═══════════ */
+const MALE_PID = -9165109095992080675n, FEMALE_PID = 2680591970127643204n;
+const BACKPACK = 'bone_Left_Spine_Backpack';
+
+/* Sửa một mesh: đổi tên xương Backpack → bone_Head, đặt position + scale */
+function patchMesh(sf, o, px, pz, s){
+  const trace = [];
+  const val = readObj(sf, o, trace);
+  const bones = val.meshData.umaBones;
+  const names = trace.filter(t => t.node === 'name');
+  if (names.length !== bones.length) throw new Error('Không khớp số xương với chuỗi tên.');
+
+  const idx = bones.findIndex(b => b.name === BACKPACK);
+  if (idx < 0) return null;                       // mesh này không có
+  const tr = names[idx];
+
+  const body = objBody(sf, o);
+  const posOff = tr.start - 40;                   // position(12) rotation(16) scale(12) name
+  const scOff  = tr.start - 12;
+
+  const oldFieldLen = 4 + tr.len + ((-(4 + tr.len)) & 3);
+  const nb = enc('bone_Head');
+  const newField = new Uint8Array(4 + nb.length + ((-(4 + nb.length)) & 3));
+  new DataView(newField.buffer).setInt32(0, nb.length, true);
+  newField.set(nb, 4);
+
+  const out = new Uint8Array(body.length - oldFieldLen + newField.length);
+  out.set(body.subarray(0, tr.start), 0);
+  out.set(newField, tr.start);
+  out.set(body.subarray(tr.start + oldFieldLen), tr.start + newField.length);
+
+  const odv = new DataView(out.buffer);
+  const before = { x: bones[idx].position.x, y: bones[idx].position.y, z: bones[idx].position.z,
+                   sx: bones[idx].scale.x, sy: bones[idx].scale.y, sz: bones[idx].scale.z };
+  if (px !== null) odv.setFloat32(posOff, px, true);
+  if (pz !== null) odv.setFloat32(posOff + 8, pz, true);
+  odv.setFloat32(scOff,     -s, true);
+  odv.setFloat32(scOff + 4,  s, true);
+  odv.setFloat32(scOff + 8,  1.0, true);
+
+  return { body: out, idx, before,
+           after: { x: px ?? before.x, y: before.y, z: pz ?? before.z, sx: -s, sy: s, sz: 1.0 } };
+}
+
+/* Ghi một chuỗi Unity: [int32 độ dài][bytes][đệm căn 4] */
+function wstr(s){
+  const sb = enc(s);
+  const f = new Uint8Array(a4(4 + sb.length));
+  new DataView(f.buffer).setInt32(0, sb.length, true);
+  f.set(sb, 4);
+  return f;
+}
+
+/*
+  Dựng lại UMAAssetIndexer:
+   - Thêm mọi recipe/race có trong bundle mà indexer chưa liệt kê (4 mục _max).
+   - Rút gọn _Path để tổng kích thước object khớp đúng `targetSize`,
+     nhờ đó dung lượng file cuối bằng đúng bản gốc.
+  _Name / _TypeIndex / m_Item (PPtr) giữ nguyên tuyệt đối — runtime chỉ dùng chúng.
+*/
+function rebuildIndexer(sf, o, known, targetSize){
+  const trace = [];
+  const val = readObj(sf, o, trace);
+  const items = val.Items;
+  const paths = trace.filter(t => t.node === '_Path');
+  if (paths.length !== items.length) throw new Error('Không khớp số _Path với số mục indexer.');
+
+  /* mục hiện có + mục còn thiếu (đối chiếu theo pathID của object trong bundle) */
+  const have = new Set(items.map(it => it.m_Item.m_PathID));
+  const added = [];
+  for (const k of known){
+    if (have.has(k.pid)) continue;
+    const sib = items.find(it => it._TypeIndex === k.typeIndex);
+    added.push({
+      _QualifiedName: '', _TypeIndex: k.typeIndex, _Name: k.name,
+      m_Item: { m_FileID: 0, m_PathID: k.pid },
+      _Path: sib ? sib._Path.replace(/[^/]+\.asset$/, k.name + '.asset') : k.name + '.asset'
+    });
+  }
+  const all = [...items, ...added].sort((a,b) => a._Name < b._Name ? -1 : a._Name > b._Name ? 1 : 0);
+
+  /* head = mọi thứ trước mảng Items (int32 số mục nằm ngay trước _QualifiedName đầu tiên) */
+  const firstQN = trace.find(t => t.node === '_QualifiedName');
+  if (!firstQN) throw new Error('Indexer không có mục nào để tham chiếu bố cục.');
+  const body0 = objBody(sf, o);
+  const head = body0.subarray(0, firstQN.start - 4);
+  const fixed = all.reduce((acc, it) =>
+    acc + a4(4 + enc(it._QualifiedName).length) + 4 + a4(4 + enc(it._Name).length) + 12, 0);
+  const budget = targetSize - head.length - 4 - fixed - 24;    // 4 = size mảng, 24 = 2 PPtr cuối
+  if (budget < all.length * 4)
+    throw new Error(`Không đủ chỗ cho ${all.length} mục (_Path cần tối thiểu ${all.length*4} B, còn ${budget} B).`);
+
+  /* rút gọn _Path: bắt đầu từ tên file, nối dần thư mục cha cho đến sát ngân sách */
+  const cur = all.map(it => it._Path.split('/').pop());
+  const total = () => cur.reduce((a,p) => a + a4(4 + enc(p).length), 0);
+  if (total() > budget) throw new Error('Không đủ chỗ cho _Path ngay cả khi chỉ giữ tên file.');
+  for (let k = 0; k < all.length; k++){
+    const parts = all[k]._Path.split('/');
+    for (let d = 2; d <= parts.length; d++){
+      const old = cur[k];
+      cur[k] = parts.slice(-d).join('/');
+      if (total() > budget){ cur[k] = old; break; }
+    }
+  }
+  /* phần dư còn lại: nới thêm thư mục cha cho mục nào vừa khít, không chèn ký tự rác */
+  let guard = 0;
+  while (total() < budget && guard++ < 2000){
+    let done = true;
+    for (let k = 0; k < all.length; k++){
+      const parts = all[k]._Path.split('/');
+      const depth = cur[k].split('/').length;
+      if (depth >= parts.length) continue;
+      const old = cur[k];
+      cur[k] = parts.slice(-(depth + 1)).join('/');
+      if (total() > budget){ cur[k] = old; } else { done = false; break; }
+    }
+    if (done) break;
+  }
+  /* nếu vẫn thiếu vài byte, đệm bằng './' ở đầu một đường dẫn (vẫn là path hợp lệ) */
+  guard = 0;
+  while (total() < budget && guard++ < 500){
+    let j = 0;
+    for (let k = 1; k < cur.length; k++) if (cur[k].length < cur[j].length) j = k;
+    cur[j] = './' + cur[j];
+  }
+  if (total() !== budget)
+    throw new Error(`Không khớp ngân sách _Path (${total()} ≠ ${budget}).`);
+
+  /* ghi lại object */
+  const parts = [head];
+  const cnt = new Uint8Array(4);
+  new DataView(cnt.buffer).setInt32(0, all.length, true);
+  parts.push(cnt);
+  for (let k = 0; k < all.length; k++){
+    const it = all[k];
+    parts.push(wstr(it._QualifiedName));
+    const ti = new Uint8Array(4);
+    new DataView(ti.buffer).setInt32(0, it._TypeIndex, true);
+    parts.push(ti);
+    parts.push(wstr(it._Name));
+    const pp = new Uint8Array(12);
+    const pv = new DataView(pp.buffer);
+    pv.setInt32(0, it.m_Item.m_FileID, true);
+    pv.setBigInt64(4, it.m_Item.m_PathID, true);
+    parts.push(pp);
+    parts.push(wstr(cur[k]));
+  }
+  const tail = new Uint8Array(24);
+  const tv = new DataView(tail.buffer);
+  tv.setInt32(0, val.BaseMaleBone.m_FileID, true);
+  tv.setBigInt64(4, val.BaseMaleBone.m_PathID, true);
+  tv.setInt32(12, val.BaseFemaleBone.m_FileID, true);
+  tv.setBigInt64(16, val.BaseFemaleBone.m_PathID, true);
+  parts.push(tail);
+
+  const len = parts.reduce((a,x) => a + x.length, 0);
+  if (len !== targetSize) throw new Error(`Indexer dựng ra ${len} B, cần ${targetSize} B.`);
+  const out = new Uint8Array(len);
+  let w = 0;
+  for (const x of parts){ out.set(x, w); w += x.length; }
+  return { body: out, names: all.map(i => i._Name), paths: cur, addedCount: added.length };
+}
+
+/* Dựng lại CAB với các object đã thay */
+function rebuildCab(sf, repl){
+  const old = sf.cab.subarray(sf.dataOffset);
+  const order = [...sf.objs].sort((a,b) => a.off - b.off);
+  const chunks = [];
+  const newOff = new Map();
+  let prevEnd = 0, cursor = 0;
+  for (const o of order){
+    const gap = old.subarray(prevEnd, o.off);
+    chunks.push(gap); cursor += gap.length;
+    const body = repl.get(o.pid) ?? old.subarray(o.off, o.off + o.size);
+    newOff.set(o.pid, cursor);
+    chunks.push(body); cursor += body.length;
+    prevEnd = o.off + o.size;
+  }
+  const tail = old.subarray(prevEnd);
+  chunks.push(tail); cursor += tail.length;
+
+  const data = new Uint8Array(cursor);
+  let w = 0;
+  for (const c of chunks){ data.set(c, w); w += c.length; }
+
+  const meta = sf.cab.slice(0, sf.dataOffset);
+  const mdv = new DataView(meta.buffer);
+  for (const o of sf.objs){
+    if (mdv.getBigInt64(o.ent, true) !== o.pid) throw new Error('Lệch bảng object.');
+    const sz = repl.has(o.pid) ? repl.get(o.pid).length : o.size;
+    mdv.setBigInt64(o.ent + 8, BigInt(newOff.get(o.pid)), true);
+    mdv.setUint32(o.ent + 16, sz, true);
+  }
+  const cabLen = sf.dataOffset + data.length;
+  mdv.setBigInt64(0x18, BigInt(cabLen), false);      // m_FileSize (big-endian)
+
+  const cab = new Uint8Array(cabLen);
+  cab.set(meta, 0); cab.set(data, meta.length);
+  return cab;
+}
+
+/* Dựng lại bundle, tái dùng luồng LZ4 blocksInfo của file gốc */
+function rebuildBundle(orig, b, cab){
+  /* Bản gốc đệm block thêm một số byte 0 sau node (ở đây là 4). Giữ đúng
+     lượng đệm đó thì block — và do đó cả file — dài đúng như cũ. */
+  const pad = b.blocks.reduce((a,x) => a + x.u, 0) - b.nodes[0].size;
+  const block = new Uint8Array(cab.length + Math.max(0, pad));
+  block.set(cab, 0);
+
+  const info = b.info.slice();
+  const idv = new DataView(info.buffer);
+  idv.setUint32(20, block.length, false);           // block.u
+  idv.setUint32(24, block.length, false);           // block.c
+  idv.setBigInt64(42, BigInt(cab.length), false);   // node.size
+
+  const ic = b.flags & 0x3F;
+  let infoOut;
+  if (ic === 0){
+    infoOut = info;
+  } else {
+    /* blocksInfo mới chỉ khác bản gốc ở vài byte kích thước, và những byte đó
+       nằm trong vùng literal của luồng LZ4 — vá thẳng vào luồng đã nén để giữ
+       nguyên độ dài như bản gốc (tự nén lại sẽ dài hơn, làm lệch dung lượng). */
+    const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
+    const root = lz4Trace(compOrig, b.uiSize);
+    const patched = compOrig.slice();
+    /* Một byte trong luồng nén có thể sinh ra nhiều byte đầu ra (qua match),
+       nên gom yêu cầu lại và chỉ chấp nhận khi mọi byte liên quan cùng giá trị. */
+    const want = new Map();
+    for (let i = 0; i < info.length; i++){
+      const src = root[i];
+      if (src < 0){
+        if (info[i] !== b.info[i])
+          throw new Error(`blocksInfo: byte ${i} không truy được về literal.`);
+        continue;
+      }
+      if (want.has(src) && want.get(src) !== info[i])
+        throw new Error(`blocksInfo: byte ${i} xung đột với byte khác dùng chung nguồn.`);
+      want.set(src, info[i]);
+    }
+    for (const [src, val] of want) patched[src] = val;
+    const check = lz4dec(patched, b.uiSize);
+    for (let i = 0; i < info.length; i++)
+      if (check[i] !== info[i]) throw new Error('blocksInfo vá xong không khớp.');
+    infoOut = patched;
+  }
+
+  const head = [];
+  head.push(enc('UnityFS'), new Uint8Array([0]));
+  const fb = new Uint8Array(4); new DataView(fb.buffer).setUint32(0, b.fmt, false);
+  head.push(fb);
+  head.push(enc(b.uv), new Uint8Array([0]), enc(b.rev), new Uint8Array([0]));
+  const tailH = new Uint8Array(20);
+  const tdv = new DataView(tailH.buffer);
+  tdv.setUint32(8, infoOut.length, false);
+  tdv.setUint32(12, b.uiSize, false);
+  tdv.setUint32(16, b.flags, false);
+  head.push(tailH);
+  let hl = head.reduce((a,x) => a + x.length, 0);
+  const padded = (b.fmt >= 7 || (b.flags & 0x200)) ? ((hl + 15) & ~15) : hl;
+  const hdr = new Uint8Array(padded);
+  let w = 0;
+  for (const x of head){ hdr.set(x, w); w += x.length; }
+  const sizePos = hdr.length - padded + (hl - 20);
+  const total = padded + infoOut.length + block.length;
+  new DataView(hdr.buffer).setBigInt64(sizePos, BigInt(total), false);
+
+  const out = new Uint8Array(total);
+  out.set(hdr, 0); out.set(infoOut, padded); out.set(block, padded + infoOut.length);
+  return out;
+}
+
+function applyPreset2(orig, b, opt){
+  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
+    throw new Error('Bundle có block bị nén — chưa hỗ trợ.');
+  const node = b.nodes[0];
+  const cab = orig.subarray(b.dataStart + node.off, b.dataStart + node.off + node.size);
+  const sf = parseSF(cab);
+
+  const male = sf.objs.find(o => o.pid === MALE_PID);
+  const female = sf.objs.find(o => o.pid === FEMALE_PID);
+  if (!male || !female) throw new Error('Không tìm thấy 2 UMAMeshAsset quen thuộc trong file này.');
+
+  const rows = [];
+  const repl = new Map();
+
+  const pm = patchMesh(sf, male, opt.mx, null, opt.s);
+  if (pm){
+    repl.set(MALE_PID, pm.body);
+    rows.push(['mesh nam', `umaBones[${pm.idx}]`, BACKPACK, 'bone_Head']);
+    rows.push(['', 'position.x', pm.before.x.toFixed(6), pm.after.x.toFixed(6)]);
+    rows.push(['', 'scale', `(${pm.before.sx.toFixed(4)}, ${pm.before.sy.toFixed(4)}, ${pm.before.sz.toFixed(4)})`,
+                            `(${pm.after.sx.toFixed(4)}, ${pm.after.sy.toFixed(4)}, ${pm.after.sz.toFixed(4)})`]);
+  }
+  const pf = patchMesh(sf, female, opt.fx, opt.fz, opt.s);
+  if (pf){
+    repl.set(FEMALE_PID, pf.body);
+    rows.push(['mesh nữ', `umaBones[${pf.idx}]`, BACKPACK, 'bone_Head']);
+    rows.push(['', 'position.x', pf.before.x.toFixed(6), pf.after.x.toFixed(6)]);
+    rows.push(['', 'position.z', pf.before.z.toFixed(6), pf.after.z.toFixed(6)]);
+    rows.push(['', 'scale', `(${pf.before.sx.toFixed(4)}, ${pf.before.sy.toFixed(4)}, ${pf.before.sz.toFixed(4)})`,
+                            `(${pf.after.sx.toFixed(4)}, ${pf.after.sy.toFixed(4)}, ${pf.after.sz.toFixed(4)})`]);
+  }
+  if (!repl.size) throw new Error(`Không tìm thấy xương ${BACKPACK} trong mesh nào — file có thể đã được sửa rồi.`);
+
+  /* Tìm UMAAssetIndexer */
+  const idxObj = sf.objs.find(o => {
+    const t = sf.types[o.tid];
+    if (t.cid !== 114 || !t.nodes) return false;
+    return buildNodes(t).some(n => n.level === 1 && n.name === 'Items');
+  });
+  if (!idxObj) throw new Error('Không tìm thấy UMAAssetIndexer.');
+
+  /* Mọi RaceData / UMATextRecipe trong bundle — để bổ sung mục còn thiếu */
+  const known = [];
+  for (const o of sf.objs){
+    const t = sf.types[o.tid];
+    if (t.cid !== 114 || !t.nodes || o.pid === idxObj.pid) continue;
+    const nn = buildNodes(t).filter(n => n.level === 1).map(n => n.name);
+    const isRace   = nn.includes('raceName');
+    const isRecipe = nn.includes('recipeData');
+    if (!isRace && !isRecipe) continue;
+    const v = readObj(sf, o, null);
+    known.push({ pid: o.pid, name: v.m_Name, typeIndex: isRace ? 2 : 3 });
+  }
+
+  /* Kích thước đích của indexer: bù lại đúng phần mà 2 mesh đã co lại,
+     để tổng CAB — và do đó dung lượng file — không đổi. */
+  let delta = 0;
+  for (const [pid, body] of repl) delta += body.length - sf.objs.find(o => o.pid === pid).size;
+  const targetSize = idxObj.size - delta;
+
+  const si = rebuildIndexer(sf, idxObj, known, targetSize);
+  repl.set(idxObj.pid, si.body);
+  rows.push(['indexer', `${si.names.length} mục`,
+             `${si.names.length - si.addedCount} mục ban đầu`,
+             `thêm ${si.addedCount} mục · _Path rút gọn`]);
+
+  const newCab = rebuildCab(sf, repl);
+  const out = rebuildBundle(orig, b, newCab);
+  return {
+    out,
+    note: `Đã dựng lại bundle — ${repl.size} object thay đổi, dung lượng giữ nguyên ${out.length.toLocaleString('vi-VN')} byte.`,
+    cols: ['Vùng','Trường','Trước','Sau'], rows,
+    extra: si
+  };
+}
+
+/* ═══════════ PRESET 3: shader định vị + đổi màu ═══════════ */
+
+/* 3 shader X-Ray trich tu ban mod, nen deflate + base64.
+   Dung de ghep vao bundle GOC o preset 3. */
+const XRAY_BLOB = {"backweapon":{"pid":"-3333330928057165289","size":8560,"z":"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"},"brmobilebumpspecdecal":{"pid":"893500320385684910","size":4656,"z":"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"},"brmobilebumpspec":{"pid":"3504935391519681939","size":8560,"z":"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"}};
+
+/* Giải nén một shader đã nhúng (deflate + base64) */
+async function loadXray(key){
+  const e = XRAY_BLOB[key];
+  if (!e) throw new Error(`Không có shader nhúng tên "${key}".`);
+  const raw = Uint8Array.from(atob(e.z), c => c.charCodeAt(0));
+  const ds = new DecompressionStream('deflate');
+  const buf = new Uint8Array(await new Response(
+    new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer());
+  if (buf.length !== e.size)
+    throw new Error(`Shader nhúng "${key}" giải ra ${buf.length} byte, cần ${e.size}.`);
+  return { body: buf, pid: BigInt(e.pid) };
+}
+
+/* Đọc danh sách property của một Shader (class 48) và offset byte của m_DefValue.
+   SerializedProperty: m_Name, m_Description, m_Attributes[], m_Type(i32),
+   m_Flags(u32), m_DefValue[0..3](f32), m_DefTexture{m_DefaultName, m_TexDim} */
+function readShaderProps(body){
+  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
+  let p = 0;
+  const rd = () => { const v = dv.getInt32(p, true); p += 4; return v; };
+  const str = () => {
+    const n = rd();
+    if (n < 0 || p + n > body.length) throw new Error('chuỗi hỏng trong shader');
+    const s = new TextDecoder().decode(body.subarray(p, p + n));
+    p = a4(p + n);
+    return s;
+  };
+  str();                                   // Shader.m_Name
+  const cnt = rd();
+  if (cnt < 0 || cnt > 500) throw new Error(`số property bất thường: ${cnt}`);
+  const props = [];
+  for (let i = 0; i < cnt; i++){
+    const name = str(), desc = str();
+    const na = rd();
+    if (na < 0 || na > 100) throw new Error('m_Attributes hỏng');
+    for (let k = 0; k < na; k++) str();
+    const type = rd();
+    p += 4;                                // m_Flags
+    const valOff = p;
+    const val = [dv.getFloat32(p,true), dv.getFloat32(p+4,true),
+                 dv.getFloat32(p+8,true), dv.getFloat32(p+12,true)];
+    p += 16;
+    str();                                 // m_DefTexture.m_DefaultName
+    p += 4;                                // m_TexDim
+    props.push({ name, desc, type, valOff, val });
+  }
+  return props;
+}
+
+const hex2rgb = h => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(h.trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255];
+};
+const rgb2hex = v =>
+  '#' + v.slice(0,3).map(x => Math.round(Math.max(0,Math.min(1,x))*255)
+        .toString(16).padStart(2,'0')).join('').toUpperCase();
+
+/* Những property tool biết cách chỉnh, và lấy giá trị từ đâu */
+const COLOR_MAP = {
+  _XRayColor:    { kind:'color', src:'xray', label:'màu súng' },
+  _OutLineColor: { kind:'color', src:'line', label:'màu viền súng' },
+  _DimColor:     { kind:'color', src:'dim',  label:'màu keo' },
+  _OutLineWidth: { kind:'float', src:'width',label:'độ dày viền' }
+};
+
+/* Chỉ đụng đúng 3 shader định vị. Các shader gốc của game cũng có
+   _OutLineColor / _DimColor (uibgglass, toonoutline…) nhưng không liên quan
+   wallhack — đổi chúng sẽ hỏng giao diện và viền toon. */
+const XRAY_SHADERS = ['backweapon', 'brmobilebumpspec', 'brmobilebumpspecdecal'];
+const isXrayShader = path => {
+  const f = path.split('/').pop().replace(/\.shader$/, '');
+  return XRAY_SHADERS.includes(f);
+};
+
+/* Ghi màu vào một shader body (sửa tại chỗ, không đổi độ dài) */
+function paintShader(body, opt, short, rows){
+  const props = readShaderProps(body);
+  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
+  let n = 0;
+  for (const p of props){
+    const spec = COLOR_MAP[p.name];
+    if (!spec) continue;
+    let next;
+    if (spec.kind === 'color'){
+      const rgb = opt[spec.src];
+      const alpha = (p.name === '_XRayColor') ? opt.alpha : p.val[3];
+      next = [rgb[0], rgb[1], rgb[2], alpha];
+    } else {
+      next = [opt.width, p.val[1], p.val[2], p.val[3]];
+    }
+    const before = spec.kind === 'color' ? rgb2hex(p.val) : p.val[0].toFixed(2);
+    const after  = spec.kind === 'color' ? rgb2hex(next)  : next[0].toFixed(2);
+    for (let i = 0; i < 4; i++) dv.setFloat32(p.valOff + i*4, next[i], true);
+    n++;
+    if (rows){
+      const sw  = spec.kind === 'color' ? `<span class="swatch" style="background:${before}"></span>` : '';
+      const sw2 = spec.kind === 'color' ? `<span class="swatch" style="background:${after}"></span>` : '';
+      rows.push([short, p.name, sw + before, sw2 + after]);
+    }
+  }
+  return n;
+}
+
+async function applyPreset3(orig, b, opt){
+  const node = b.nodes[0];
+  if (!node) throw new Error('Bundle không có node nào.');
+
+  const { data, blockAt } = decompressAll(orig, b);
+  const cab = data.subarray(node.off, node.off + node.size);
+  const sf = parseSF(cab);
+
+  /* Ánh xạ pathID → đường dẫn asset, để nhận diện shader theo tên */
+  const abObj = sf.objs.find(o => o.cid === 142);
+  const nameOf = new Map();
+  if (abObj){
+    const v = readObj(sf, abObj, null);
+    for (const c of v.m_Container) nameOf.set(c.second.asset.m_PathID, c.first);
+  }
+
+  /* Xem 3 shader định vị đang ở dạng nào */
+  const slots = new Map();                  // key → object
+  for (const o of sf.objs){
+    if (o.cid !== 48) continue;
+    const path = nameOf.get(o.pid);
+    if (!path || !isXrayShader(path)) continue;
+    slots.set(path.split('/').pop().replace(/\.shader$/, ''), o);
+  }
+  if (!slots.size)
+    throw new Error('Không tìm thấy backweapon / brmobilebumpspec / brmobilebumpspecdecal ' +
+                    'trong bundle này. Đây có phải file shaders của game không?');
+
+  const rows = [];
+  const repl = new Map();                   // pid → body mới
+  let swapped = 0, painted = 0;
+
+  for (const [key, o] of slots){
+    const bodyStart = sf.dataOffset + o.off;
+    const cur = cab.subarray(bodyStart, bodyStart + o.size);
+
+    /* Đã là bản X-Ray chưa? (nhận biết qua property đặc trưng) */
+    let isXray = false;
+    try {
+      isXray = readShaderProps(cur).some(p => p.name === '_XRayColor' || p.name === '_DimColor');
+    } catch (e) { /* không đọc được -> coi như chưa */ }
+
+    let body;
+    if (isXray){
+      body = cur.slice();                   // giữ nguyên, chỉ sơn lại màu
+    } else {
+      const x = await loadXray(key);        // thay bằng shader X-Ray nhúng sẵn
+      if (x.pid !== o.pid)
+        throw new Error(`pathID của ${key} không khớp shader nhúng ` +
+                        `(${o.pid} ≠ ${x.pid}) — bundle này khác phiên bản.`);
+      if (x.body.length > o.size)
+        throw new Error(`Shader X-Ray của ${key} (${x.body.length} B) lớn hơn shader gốc ` +
+                        `(${o.size} B) — không đệm vừa.`);
+      /* Giữ NGUYÊN kích thước object: phần dư đệm 0.
+         Nhờ vậy chỉ những block chứa shader mới phải nén lại, các block khác
+         giữ nguyên byte gốc — nếu để object co lại thì mọi block phía sau đều
+         dịch, phải nén lại toàn bộ, và bộ nén ở đây kém LZ4HC ~5% nên sẽ vượt
+         dung lượng gốc. Đệm 0 lại nén rất tốt. */
+      body = new Uint8Array(o.size);
+      body.set(x.body, 0);
+      swapped++;
+      rows.push([key + '.shader', '(toàn bộ shader)',
+                 `gốc ${o.size.toLocaleString('vi-VN')} B`,
+                 `X-Ray ${x.body.length.toLocaleString('vi-VN')} B + đệm`]);
+    }
+    painted += paintShader(body, opt, key + '.shader', rows);
+    repl.set(o.pid, body);
+  }
+
+  const out = rebuildShaders(orig, b, data, blockAt, sf, node, repl);
+  const what = swapped
+    ? `Đã thay <b>${swapped}</b> shader gốc bằng bản X-Ray và đặt màu`
+    : `Đã đổi màu <b>${slots.size}</b> shader định vị`;
+  return {
+    out,
+    note: `${what} — ${painted} giá trị, dung lượng giữ nguyên ` +
+          `${out.length.toLocaleString('vi-VN')} byte.`,
+    cols: ['Shader','Property','Trước','Sau'], rows, html: true
+  };
+}
+
+/* Giải nén mọi block, ghi lại block nào phủ vùng nào */
+function decompressAll(orig, b){
+  const parts = [];
+  const blockAt = [];
+  let pos = b.dataStart, outPos = 0;
+  for (const blk of b.blocks){
+    const raw = orig.subarray(pos, pos + blk.c);
+    const ct = blk.f & 0x3F;
+    const dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+    parts.push(dec);
+    blockAt.push({ start: outPos, end: outPos + blk.u, comp: blk.c, ct, srcOff: pos });
+    outPos += blk.u; pos += blk.c;
+  }
+  const data = new Uint8Array(outPos);
+  let w = 0;
+  for (const p of parts){ data.set(p, w); w += p.length; }
+  return { data, blockAt };
+}
+
+/*
+  Dựng lại bundle shaders sau khi thay/sơn shader.
+
+  Thay shader làm object đổi độ dài → phải dựng lại CAB (bảng object + vùng dữ
+  liệu), rồi nén lại toàn bộ block. Bộ nén ở đây kém LZ4HC gốc vài phần trăm;
+  phần phình ra được bù bằng vùng đệm cuối file để dung lượng không đổi.
+*/
+function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
+  /* Mọi object giữ nguyên kích thước (shader X-Ray đã được đệm 0 cho bằng
+     shader gốc), nên chỉ cần ghi đè tại chỗ vào luồng dữ liệu đã giải nén và
+     nén lại đúng những block bị đụng. */
+  const touched = new Set();
+  for (const o of sf.objs){
+    const body = repl.get(o.pid);
+    if (!body) continue;
+    if (body.length !== o.size)
+      throw new Error(`Object ${o.pid} đổi kích thước (${o.size} → ${body.length}) — chưa hỗ trợ.`);
+    const abs = node.off + sf.dataOffset + o.off;
+    data.set(body, abs);
+    for (let i = 0; i < blockAt.length; i++){
+      const s = blockAt[i];
+      if (abs < s.end && abs + body.length > s.start) touched.add(i);
+    }
+  }
+  if (!touched.size) throw new Error('Không có gì thay đổi.');
+
+  /* Nén lại block bị đụng, giữ nguyên byte gốc cho các block còn lại */
+  const parts = [], newBlocks = [];
+  for (let i = 0; i < b.blocks.length; i++){
+    const blk = b.blocks[i], at = blockAt[i];
+    if (!touched.has(i)){
+      parts.push(orig.subarray(at.srcOff, at.srcOff + blk.c));
+      newBlocks.push({ u: blk.u, c: blk.c, f: blk.f });
+      continue;
+    }
+    const raw = data.subarray(at.start, at.end);
+    let comp, flags = blk.f;
+    if ((blk.f & 0x3F) === 0){
+      comp = raw;
+    } else {
+      comp = lz4enc(raw);
+      const back = lz4dec(comp, raw.length);
+      for (let k = 0; k < raw.length; k++)
+        if (back[k] !== raw[k]) throw new Error(`Nén lại block ${i} sai ở byte ${k}.`);
+      if (comp.length >= raw.length){ comp = raw; flags = blk.f & ~0x3F; }
+    }
+    parts.push(comp);
+    newBlocks.push({ u: blk.u, c: comp.length, f: flags });
+  }
+
+  /* blocksInfo: giữ nguyên bố cục gốc, chỉ cập nhật kích thước block */
+  const info = b.info.slice();
+  const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+  let q = 20;
+  for (const nb of newBlocks){
+    idv.setUint32(q, nb.u, false);
+    idv.setUint32(q + 4, nb.c, false);
+    idv.setUint16(q + 8, nb.f, false);
+    q += 10;
+  }
+  const infoOut = ((b.flags & 0x3F) === 0) ? info : lz4enc(info);
+
+  /* 5. ráp lại, đệm 0 cho bằng đúng dung lượng file nguồn */
+  const dataLen = parts.reduce((a, x) => a + x.length, 0);
+  const atEnd = !!(b.flags & 0x80);
+  const headLen = atEnd ? b.dataStart : b.infoOff;
+  let core = headLen + dataLen + infoOut.length;
+  if (!atEnd && (b.flags & 0x200))
+    core = ((headLen + infoOut.length + 15) & ~15) + dataLen;
+  if (core > orig.length)
+    throw new Error(`Nén lại phình ${(core - orig.length).toLocaleString('vi-VN')} byte so với ` +
+                    `dung lượng gốc — không đủ chỗ đệm.`);
+
+  const out = new Uint8Array(orig.length);           // phần dư tự là 0
+  if (atEnd){
+    out.set(orig.subarray(0, headLen), 0);
+    let p = headLen;
+    for (const x of parts){ out.set(x, p); p += x.length; }
+    out.set(infoOut, p);
+  } else {
+    out.set(orig.subarray(0, b.infoOff), 0);
+    out.set(infoOut, b.infoOff);
+    let p = b.infoOff + infoOut.length;
+    if (b.flags & 0x200) p = (p + 15) & ~15;
+    for (const x of parts){ out.set(x, p); p += x.length; }
+  }
+  const sp = findSizePos(out);
+  const odv = new DataView(out.buffer);
+  /* Với blocksInfoAtTheEnd, blocksInfo nằm ngay sau vùng dữ liệu chứ không ở
+     cuối file — phần đệm nằm sau nó. Trường size phải khai đúng phần thực
+     dùng, nếu không hàm dò blocksInfo sẽ tìm sai chỗ. */
+  odv.setBigInt64(sp, BigInt(atEnd ? core : out.length), false);
+  odv.setUint32(sp + 8, infoOut.length, false);      // ciSize
+  odv.setUint32(sp + 12, info.length, false);        // uiSize
+  return out;
+}
+
+/* Vị trí trường size (int64 BE) trong header UnityFS */
+function findSizePos(u8){
+  let p = 0;
+  while (u8[p]) p++;               // "UnityFS"
+  p++; p += 4;                     // \0 + version
+  while (u8[p]) p++; p++;          // unityVersion
+  while (u8[p]) p++; p++;          // unityRevision
+  return p;
+}
+
+/* ═══════════ PRESET 4: định vị nhân vật (hologram) ═══════════ */
+
+/* hologram.shader goc, nen deflate + base64. Dung de thay toan bo
+   shader nhan vat o preset 4. */
+const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
+
+/* 48 shader nhân vật đều được thay bằng hologram, nên mọi thứ trên người
+   (da, tóc, quần áo, mũ) đều vẽ bằng shader phát sáng này. */
+const HOLO_PROPS = {
+  _TintColor:     { kind:'color',  src:'tint', label:'màu nhân vật' },
+  _RimColor:      { kind:'color',  src:'rim',  label:'màu sáng mép' },
+  _ScanColor:     { kind:'color',  src:'scan', label:'màu quét' },
+  /* Bật/tắt hiệu ứng: tắt = (0,0,0,0), bật = giá trị gốc của shader */
+  _Line:          { kind:'vec4', src:'line',   on:[100,100,50,50], off:[0,0,0,0] },
+  _LineAndGlitch: { kind:'vec4', src:'glitch', on:[0.5,0.5,5,0.1], off:[0,0,0,0] }
+};
+
+async function loadHolo(){
+  const e = HOLO_BLOB.hologram;
+  const raw = Uint8Array.from(atob(e.z), c => c.charCodeAt(0));
+  const ds = new DecompressionStream('deflate');
+  const buf = new Uint8Array(await new Response(
+    new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer());
+  if (buf.length !== e.size)
+    throw new Error(`Shader hologram giải ra ${buf.length} byte, cần ${e.size}.`);
+  return { body: buf, pid: BigInt(e.pid) };
+}
+
+/*
+  zTest quyết định XUYÊN TƯỜNG, và nó KHÔNG phải property — nằm trong
+  m_ParsedForm.m_SubShaders[].m_Passes[].m_State.zTest (float 4 byte).
+    4 = LEqual  → chỉ vẽ khi ở gần hơn, bị tường che (mặc định)
+    8 = Always  → luôn vẽ, xuyên qua mọi vật cản
+  Bản mod gốc đặt 8. Dò offset bằng chính typetree thay vì hardcode. */
+const ZTEST_NAMES = { 0:'Disabled',1:'Never',2:'Less',3:'Equal',4:'LEqual',
+                      5:'Greater',6:'NotEqual',7:'GEqual',8:'Always' };
+
+/* Tìm offset byte của mọi m_State.zTest trong một Shader object */
+function findZTest(body, type){
+  const nodes = buildNodes(type);
+  const r = makeReader(body);
+  const hits = [];
+  const walk = (i, inState) => {
+    const n = nodes[i];
+    const align = (n.meta & 0x4000) !== 0;
+    const kids = [];
+    let j = i + 1;
+    while (j < nodes.length && nodes[j].level > n.level){
+      if (nodes[j].level === n.level + 1) kids.push(j);
+      j++;
+    }
+    const start = r.p;
+    const t = n.type;
+    if (t === 'SInt8' || t === 'UInt8' || t === 'char' || t === 'bool') r.p += 1;
+    else if (t === 'SInt16' || t === 'UInt16' || t === 'short' || t === 'unsigned short') r.p += 2;
+    else if (t === 'SInt32' || t === 'int' || t === 'Type*' || t === 'UInt32' ||
+             t === 'unsigned int' || t === 'float') r.p += 4;
+    else if (t === 'SInt64' || t === 'UInt64' || t === 'long long' ||
+             t === 'unsigned long long' || t === 'FileSize' || t === 'double') r.p += 8;
+    else if (t === 'string'){
+      const ln = r.dv.getInt32(r.p, true); r.p += 4 + ln; r.align();
+    } else if (t === 'TypelessData'){
+      const ln = r.dv.getInt32(r.p, true); r.p += 4 + ln;
+    } else if (kids.length && nodes[kids[0]].type === 'Array'){
+      const ai = kids[0];
+      const ak = [];
+      let k = ai + 1;
+      while (k < nodes.length && nodes[k].level > nodes[ai].level){
+        if (nodes[k].level === nodes[ai].level + 1) ak.push(k);
+        k++;
+      }
+      const size = r.dv.getInt32(r.p, true); r.p += 4;
+      for (let m = 0; m < size; m++) walk(ak[1], inState);
+      if (nodes[ai].meta & 0x4000) r.align();
+    } else {
+      for (const c of kids) walk(c, inState || n.name === 'm_State');
+    }
+    if (align) r.align();
+    /* SerializedShaderFloatValue { float val; FastPropertyName name; } */
+    if (n.name === 'zTest' && inState) hits.push(start);
+  };
+  walk(0, false);
+  return hits;
+}
+
+/* Ghi 3 màu + 2 vector hiệu ứng + zTest vào một bản sao hologram */
+function paintHolo(body, opt, rows, label, type){
+  const props = readShaderProps(body);
+  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
+  let n = 0;
+  for (const p of props){
+    const spec = HOLO_PROPS[p.name];
+    if (!spec) continue;
+    let next, before, after;
+    if (spec.kind === 'color'){
+      const rgb = opt[spec.src];
+      const a = opt[spec.src + 'A'];
+      next = [rgb[0], rgb[1], rgb[2], a];
+      before = rgb2hex(p.val); after = rgb2hex(next);
+    } else {
+      next = opt[spec.src] ? spec.on : spec.off;
+      before = `(${p.val.map(x => +x.toFixed(2)).join(', ')})`;
+      after  = `(${next.join(', ')})`;
+    }
+    for (let i = 0; i < 4; i++) dv.setFloat32(p.valOff + i*4, next[i], true);
+    n++;
+    if (rows){
+      const sw  = spec.kind === 'color' ? `<span class="swatch" style="background:${before}"></span>` : '';
+      const sw2 = spec.kind === 'color' ? `<span class="swatch" style="background:${after}"></span>` : '';
+      rows.push([label, p.name, sw + before, sw2 + after]);
+    }
+  }
+
+  /* zTest — thứ thực sự làm xuyên tường */
+  const want = opt.xray ? 8 : 4;
+  const zs = findZTest(body, type);
+  for (const off of zs){
+    const old = dv.getFloat32(off, true);
+    if (old === want) continue;
+    dv.setFloat32(off, want, true);
+    n++;
+    if (rows) rows.push([label, 'zTest (xuyên tường)',
+      `${old} · ${ZTEST_NAMES[old] || '?'}`, `${want} · ${ZTEST_NAMES[want]}`]);
+  }
+  if (!zs.length && rows)
+    rows.push([label, 'zTest', 'không tìm thấy', '— bỏ qua']);
+  return n;
+}
+
+async function applyPreset4(orig, b, opt){
+  const node = b.nodes[0];
+  if (!node) throw new Error('Bundle không có node nào.');
+
+  const { data, blockAt } = decompressAll(orig, b);
+  const cab = data.subarray(node.off, node.off + node.size);
+  const sf = parseSF(cab);
+
+  const abObj = sf.objs.find(o => o.cid === 142);
+  const nameOf = new Map();
+  if (abObj){
+    const v = readObj(sf, abObj, null);
+    for (const c of v.m_Container) nameOf.set(c.second.asset.m_PathID, c.first);
+  }
+
+  const shaders = sf.objs.filter(o => o.cid === 48);
+  if (!shaders.length)
+    throw new Error('Bundle này không có shader nào — đây có phải optionalavatarres_commonab_shader không?');
+
+  const holo = await loadHolo();
+  const rows = [];
+  /* Sơn màu + đặt zTest một lần rồi dùng chung cho mọi shader */
+  const shType = sf.types[shaders[0].tid];
+  const painted = holo.body.slice();
+  const nSet = paintHolo(painted, opt, rows, 'hologram', shType);
+
+  /* Thay từng shader bằng bản hologram đã sơn, đệm 0 cho bằng kích thước cũ.
+     Giữ nguyên kích thước object → chỉ nén lại block bị đụng, và dung lượng
+     file không đổi. Shader nhỏ hơn hologram thì bỏ qua (không đệm vừa). */
+  const repl = new Map();
+  let swapped = 0, skipped = 0;
+  for (const o of shaders){
+    if (o.size < painted.length){ skipped++; continue; }
+    const body = new Uint8Array(o.size);
+    body.set(painted, 0);
+    repl.set(o.pid, body);
+    swapped++;
+  }
+  if (!swapped)
+    throw new Error('Không shader nào đủ chỗ để thay bằng hologram.');
+
+  rows.push(['— áp dụng —', `${swapped} shader`,
+             `${shaders.length} shader trong bundle`,
+             `thay ${swapped}` + (skipped ? `, bỏ qua ${skipped} (quá nhỏ)` : '')]);
+
+  const out = rebuildShaders(orig, b, data, blockAt, sf, node, repl);
+  return {
+    out,
+    note: `Đã thay <b>${swapped}</b> shader nhân vật bằng hologram và đặt màu — ` +
+          `${nSet} giá trị, dung lượng giữ nguyên ${out.length.toLocaleString('vi-VN')} byte.`,
+    cols: ['Vùng','Property','Trước','Sau'], rows, html: true
+  };
+}
+/* giao diện hai chế độ — cấu hình nội bộ */
+const EMBEDDED_CHARACTER_PATH_IDS = ["-9007693228912274671","-8997106950628589213","-8478029966577821520","-8300143392923685275","-7709220198674806991","-7706366410487681155","-7456319726778811706","-7339408303987581151","-6752853195891321129","-6375313063198326696","-6026104910837093439","-5664652606272631681","-5339677376830617823","-5168853197254188432","-5058626917479854697","-4682061540934771623","-4146218516961544267","-3505057722772339092","-3333330928057165289","-2201932135457296856","-1596360303464866160","-1071840675521347683","-723329848025175956","174363873095465402","839317541599106419","1012005951022822578","1304023185857453668","1552025574220148707","3188242941404455618","3256695002432349354","3504935391519681939","3586539510690888244","4574083651140609685","4925795290281485147","5535151704536395474","5858115296128740488","6276975003217442154","6337164326870709673","6831856860032126211","7146432734730272451","7562733715703912717","7796715460158179885","7829645994112320953","8009967136636585461","8156564312501016934","8226928945473814163","9026648381118478326"];
+const EMBEDDED_CHARACTER_HEX = "000000000B0000000C0000005F536F75726365416C70686106000000536F757263650000010000002A000000456E756D28537263416C7068612C352C4F6E652C312C4F6E654D696E7573537263416C7068612C313029000002000000000000000000A04000000000000000000000000000000000010000000A0000005F44657374416C70686100000400000044657374010000002A000000456E756D28537263416C7068612C352C4F6E652C312C4F6E654D696E7573537263416C7068612C31302900000200000000000000000020410000000000000000000000000000000001000000050000005F43756C6C0000000800000043756C6C4D6F64650100000024000000456E756D28556E697479456E67696E652E52656E646572696E672E43756C6C4D6F64652902000000000000000000004000000000000000000000000000000000010000000A0000005F54696E74436F6C6F7200002800000054696E7420436F6C6F722C285247423A54696E7420436F6C6F722C413A57686F6C65416C7068612901000000090000005370616365283130290000000000000000000000000000000000003F0000803F0000803F0000000001000000090000005F52696D436F6C6F720000003000000052696D20436F6C6F722C20285247423A52696D20436F6C6F722C20413A52696D20416C70686120537472656E67746829000000000000000000000000000000000000803F0000803F0000803F00000000010000000A0000005F5363616E436F6C6F720000310000005363616E436F6C6F722C285247423A5363616E20436F6C6F722C20413A5363616E20416C70686120537472656E67746829000000000000000000000000000000000000000000803F0000803F0000003F0000000001000000080000005F4D61696E5465781A0000004D61696E20546578747572652C2853545F5A573A53706565642900000100000009000000537061636528313029000000040000000000000000000000000000000000000000000000050000007768697465000000020000000C0000005F537061636553656C6563742E000000583A576F726C645370616365204F7220436C697053706163652C595A3A4C696E654469722C573A5363616E44697200000000000001000000000000000000803F0000803F0000803F0000803F00000000010000000E0000005F4C696E65416E64476C697463680000350000004C696E655769647468285859292C20476C6974636865734F76657254696D65285A292C20476C69746368537472656E6774682857290000000000000001000000000000000000003F0000003F0000A040CDCCCC3D0000000001000000050000005F4C696E650000001D0000004C696E65416D6F756E74285859292C204C696E655370656564285A57290000000000000001000000000000000000C8420000C84200004842000048420000000001000000050000005F5363616E0000001D0000005363616E526570656174285859292C205363616E5370656564285A57290000000000000001000000000000000000803F0000004000008040000060410000000001000000010000000100000001000000787EC21D503B172E405CA567014D0322010000000E000000110000000800000046476C6F62616C730B0000000800000056476C6F62616C7300000000050000005F4C696E65000000100000000E0000005F4C696E65416E64476C69746368000005000000080000005F4D61696E5465780A0000000B0000005F4D61696E5465785F53540004000000090000005F52696D436F6C6F720000000D000000050000005F5363616E0000000F0000000A0000005F5363616E436F6C6F7200000E000000080000005F53696E54696D65020000000C0000005F537061636553656C65637406000000050000005F54696D65000000010000000A0000005F54696E74436F6C6F7200000C000000140000005F576F726C64537061636543616D657261506F73030000000E000000756E6974795F4D6174726978565000000900000013000000756E6974795F4F626A656374546F576F726C64000700000013000000756E6974795F576F726C64546F4F626A65637400080000000000000000000000000000000C0000005F536F75726365416C706861000000000A0000005F44657374416C7068610000000000000C0000005F536F75726365416C706861000000000A0000005F44657374416C706861000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000000803F090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000007041090000003C6E6F6E696E69743E000000000000000000803F090000003C6E6F6E696E69743E00000000000041090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000050000005F43756C6C00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000041090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000041090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000041090000003C6E6F6E696E69743E00000000007F43090000003C6E6F6E696E69743E00000000007F43090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E000000000000000E000000756E6974795F466F6753746172740000000000000C000000756E6974795F466F67456E640000000010000000756E6974795F466F6744656E7369747900000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E00000000000000090000003C6E6F6E696E69743E0000000E000000756E6974795F466F67436F6C6F720000FFFFFFFF863F0000040000000F00000049474E4F524550524F4A4543544F520004000000747275650B00000050726576696577547970650005000000506C616E650000000500000051554555450000000B0000005472616E73706172656E74000A00000052656E6465725479706500000B0000005472616E73706172656E7400000000000000000006000000000000000400000001000000010000000000000001000000000000001700000001000000010000000000000001000000000000001700000001000000010000000000000001000000000000001700000000000000040000000100000000000000010000000000000001000000000000000000000000000000000000000000000000000000010000000000000003000000070000003000000000000000000400000800000070000000000000000004000009000000B000000000000000000400000600000001000000000000000000000000040000020000001000000000000000000400000300000020000000000000000003000004000000F0000000000000000304000005000000F800000000000000030400000600000000010000000000000304000000000000080100000100000001000000000000000000000001000000000000000000000004000000000001000200030000000000040000000100000003000000000000000100000000000000180000000100000003000000000000000100000000000000180000000100000003000000000000000100000000000000180000000000000004000000010000000200000001000000020000000100000002000000000000000000000000000000010000000A00000000000000000000000002000000000000010000000B0000000000000007000000010000000000000000000000000400000C0000001000000000000000030400000D0000001800000000000000030400000E0000002000000000000000030400000F0000002800000000000000030400001000000030000000000000000304000005000000380000000000000003040000000000004000000001000000010000000B000000000000000100000000000000000000000400000000000100020003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000F00000049474E4F524550524F4A4543544F520004000000747275650B00000050726576696577547970650005000000506C616E650000000500000051554555450000000B0000005472616E73706172656E74000A00000052656E6465725479706500000B0000005472616E73706172656E740000000000040000001400000053544552454F5F494E5354414E43494E475F4F4E18000000554E4954595F53494E474C455F504153535F53544552454F1300000053544552454F5F4D554C5449564945575F4F4E001800000053544552454F5F435542454D41505F52454E4445525F4F4E04000000000000001800000042524D6F62696C652F4172745646582F486F6C6F6772616D0000000000000000000000000000000000000000010000000E0000000100000001000000000000000100000001000000700900000100000001000000E41B00007009000053040000003404000001006268000000BC110C00262412180062581200008C090C006EBA750A0C02000100EA0800000056476C6F62616C7308011C000034002F1700010003FF0272110000FECA0DF030000000060000003C2800048025000000FFFFFFFF0C00FC15786C61744D746C4D61696E0023696E636C756465203C6D6574616C5F7374646C69623E0A1800F10A746578747572653E0A7573696E67206E616D657370616365201F00943B0A73747275637420C300F90A5F547970650A7B0A20202020666C6F617434205F54696D653B12003B53696E15009033205F576F726C64535C009943616D657261506F733600F10C686C736C63635F6D7478347834756E6974795F4F626A656374546F3B003F5B345D30000D01280022546F37000F300010854D617472697856502B007068616C6634205F4201695465785F53541700D94C696E65416E64476C697463681A0001D700B453656C6563743B0A7D3B0A3701CA4D746C5F566572746578496E3601F80E504F534954494F4E30205B5B20617474726962757465283029205D5D205C005B434F4C4F52260017312600015000AB3220544558434F4F52442A001C322A008B33204E4F524D414C2800133328000FBC00023A4F7574BD00C06D746C5F506F736974696F6E480013700C00EF2C20696E76617269616E74205D5DC600035275736572280F00192925001A33C400012800051200062B0003CE01041A001D312C0012312C0000CA001176BF000ACA0017202603112852007B636F6E7374616EE50215260F00006200626275666665729F01112C360008DB016020696E7075742800EB73746167655F696E205D5D290A7B2900007E00696F7574707574CB0020755F93001230140043626F6F6C12002F6230270000183156010313003F365F312A000016322A00062900193335020217001234140033696E7411002669348C000425001E62260017384C0004620003750003D300912E78203D20666D61282001152EF402A52E782C203230302E302C6501142E35043F2E77294400005572616374281200092200466230203D2D00613E3D302E383901002E37364900053300723F20312E30203ABE005F28302E30292D0005000C00172AA80001A5001F782E000B025600063400093A042F2E7A6C00003F73696EE000041B345E002C2B204E0119790F0156342E79203D3C000011013131353001001B36290000590032302E321D004530333E3D36000B81000052001173DF0412283B021128BD01003701132C4D02202831120011311200013902162867002F7929D2000611343001040C001F792700060F5701101F77C3010C0FDD00052E203D520140202A2035A1020E2B0006A9011B34A9012169384A002074281D01163C240063203F2030784601005075203A207525001A3014012469343D00053900103C5F010F3D001724282D87003B29202BCA0308C1000245010420000948001F310B01013879797900030FA7070E7C315D2E7878797A58000007040F450017123045001D2C8F0054787878782C57001F2965002B1F326500054F7A7A7A7A6500351F336500054F777777776500031532B90211318B000F7F010C05C6082C315D46000EAB000F3B000425305D8B0001F201040E002F32295300261732530008EC001F32EC00043F32202BE700131A33E700332E787A970005ED0305220217340C000029000A2204067B0001A30125202F0F0000B000022B0002B007192EF2081A3D620703230003E308044203020F000C3C0204A503005803267A77A9031C31990000D00002CF0707F00407670A010903152962010409000AC70620312ED7000976000275000653000F960B000035002C782EC30300A90147646F74285A00182C67001D292E00457273717230001F3299000202930A06240005A6051C31800033322E788100025F0103C60A0287000E37020F140C052D305DAC003F322E795A00311F315A00011F7A5A00312E325D60010A8E0118328E011F328E011E1F328E010D1D320E023E365F3310020F82000802300066636C616D70281300014208116836082968294D0305F90B182EC00200340000BF0200D40A0070080DED022D203DA9090538081732490306E10D3F2E7A7746000106B50A068A003F78792C4A000A3878792912030FD1000501600000C2002D32282D0008BB0806B503167828043F302E7A57000248312E7A7736041F32360404257777A400082805008F040CB1010DEB06094900207979230701870C02FA09142D000A020B0014291D0015301700040A002F2929C300041978530200AD04057101069600074E0A0D41001F79410012247A7741006572657475726E940D937D0A00001B000000045C11930D000000030000000E1400400F000000C3111F10F0110C134632012E4000F0111F18C811042F6409F01173050D0F00680A8233325F742072705F2101B05F72656D61705F6D61736BEB0E4066756E630F07145F33000297100743000109000149000D450000E3061F285A0002703E3E2030292026F60A057E121F467E1212038C119954696E74436F6C6F7216003E52696D15004F5363616E1600030DF8110F0912090B351185467261676D656E74F3110F03110C1F200411181F200511191F209B000606D211029C009153565F5461726765747700106313010D9E0116305811136647000C54000F5C11081A465C111F465C110A7473616D706C65720800046505016111031B00082F0003D4023032643CCE00A22C206163636573733A3A2C0038203E204100032D00036A1306CC1106B6010FCE110E08F2000FD0110D02D601057E041E305A110FE7111807D311163216001F35E911012B3131520615799A0A07710516791D071946560F0E93062F7A774100002F7A774100010041030C41000358071F469E07070B81000D98072F7A774000150180002F7A77ED0B043630202B51080D2400096A120B681202C3001E28B0000987103478792949111D30060122365FC90A01C2080425001877DF070F300003090F00122A3F003C302E352D0012353A0806B100004010052E0924203A39001E303900197939001F793900152D3131170200B409172AAA01047B052F2E77AE000206BA0D021300192C9600182C6B001F2941000F103241000A0B02037D000958001F786701002B7A776901015E020F4C00012A78798609063F05192E44002A352E4200059B060D0B011330830B04AA04122EBC041B28020505CF080E9C0A2C2929A50B1F30D70B02036C00142939032F3328A000012F787989020123797ABB02293328700F056809283328FD0E0146001D2C8000016B013F29292943010503B6000F820B000197110F590200088C0E03A9000FE20907600000000000000100000002000000000000000000000001000000";
+let FILE = null, ORIG = null, BUN = null;
+const el = id => document.getElementById(id);
+const show = (id, html) => { el(id).innerHTML = html; };
+function hexValue(id) { return hex2rgb(el(id).value) || [0,0,0]; }
+function parseHexCode(text) {
+  const clean = String(text || '').replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '');
+  if (!clean || clean.length % 2) throw new Error('Cấu hình HEX không hợp lệ.');
+  const out = new Uint8Array(clean.length / 2);
+  for (let i=0;i<out.length;i++) out[i] = parseInt(clean.slice(i*2,i*2+2),16);
+  return out;
+}
+function characterOptions(){ return {tint:hex2rgb(el('chTint').value),rim:hex2rgb(el('chRim').value),scan:hex2rgb(el('chScan').value),tintA:Number(el('chTintA').value),rimA:Number(el('chRimA').value),scanA:Number(el('chScanA').value)}; }
+function paintEmbeddedCharacter(body,opt){
+  const props=readShaderProps(body), dv=new DataView(body.buffer,body.byteOffset,body.byteLength);
+  const map={_TintColor:[opt.tint,opt.tintA],_RimColor:[opt.rim,opt.rimA],_ScanColor:[opt.scan,opt.scanA]};
+  for(const p of props){ const x=map[p.name]; if(!x) continue; const v=[x[0][0],x[0][1],x[0][2],x[1]]; for(let i=0;i<4;i++) dv.setFloat32(p.valOff+i*4,v[i],true); }
+}
+function applyCharacterHex(orig,b,ids,hex,opt){
+  const node=b.nodes[0]; if(!node) throw new Error('Bundle không có node dữ liệu.');
+  const {data,blockAt}=decompressAll(orig,b), cab=data.subarray(node.off,node.off+node.size), sf=parseSF(cab);
+  const shaders=sf.objs.filter(o=>o.cid===48); if(!shaders.length) throw new Error('Bundle không có object Shader.');
+  const repl=new Map();
+  for(const id of ids){ const o=shaders.find(x=>x.pid.toString()===id); if(!o) continue; if(hex.length>o.size) throw new Error('Dữ liệu cấu hình không tương thích.'); const body=new Uint8Array(o.size); body.set(hex); paintEmbeddedCharacter(body,opt); repl.set(o.pid,body); }
+  if(!repl.size) throw new Error('Không tìm thấy shader nhân vật tương thích.');
+  return rebuildShaders(orig,b,data,blockAt,sf,node,repl);
+}
+function gunOptions() { return {xray:hexValue('cXray'),line:hexValue('cLine'),dim:hexValue('cDim'),width:Number(el('rWidth').value),alpha:Number(el('rAlpha').value)}; }
+function setMode(mode) { document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.querySelector('input').value===mode)); el('gunPanel').classList.toggle('hidden',mode!=='gun'); el('characterPanel').classList.toggle('hidden',mode!=='character'); }
+document.querySelectorAll('input[name="mode"]').forEach(r=>r.addEventListener('change',()=>setMode(r.value)));
+el('file').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;FILE=f;ORIG=null;BUN=null;el('go').disabled=true;show('info','<div class="msg warn">Đang kiểm tra file…</div>');try{ORIG=new Uint8Array(await f.arrayBuffer());BUN=parseBundle(ORIG);el('fileName').textContent=`${f.name} — ${ORIG.length.toLocaleString('vi-VN')} byte`;show('info','<div class="msg ok">File sẵn sàng.</div>');el('go').disabled=false;show('out','');}catch(err){show('info','<div class="msg bad">Không thể xử lý file.</div>');}});
+el('rWidth').addEventListener('input',()=>el('wVal').textContent=Number(el('rWidth').value).toFixed(1));
+el('rAlpha').addEventListener('input',()=>el('aVal').textContent=Number(el('rAlpha').value).toFixed(2));
+for(const [id,outId] of [['chTint','chTintVal'],['chRim','chRimVal'],['chScan','chScanVal']]) el(id).addEventListener('input',()=>el(outId).textContent=el(id).value.toUpperCase());
+for(const [id,outId] of [['chTintA','chTintAVal'],['chRimA','chRimAVal'],['chScanA','chScanAVal']]) el(id).addEventListener('input',()=>el(outId).textContent=Number(el(id).value).toFixed(2));
+el('go').addEventListener('click',async()=>{const btn=el('go');btn.disabled=true;btn.textContent='Đang xử lý…';try{if(!ORIG||!BUN)throw new Error('Chưa chọn file.');const mode=document.querySelector('input[name="mode"]:checked').value;let output;if(mode==='gun') output=(await applyPreset3(ORIG,BUN,gunOptions())).out;else output=applyCharacterHex(ORIG,BUN,EMBEDDED_CHARACTER_PATH_IDS,parseHexCode(EMBEDDED_CHARACTER_HEX),characterOptions());show('out','<section class="panel"><div class="msg ok">Hoàn tất.</div><button id="dl" style="margin-top:12px">Tải file</button></section>');el('dl').onclick=()=>{const u=URL.createObjectURL(new Blob([output],{type:'application/octet-stream'})),a=document.createElement('a');a.href=u;a.download=FILE.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);};}catch(err){show('out','<div class="msg bad">Không thể hoàn tất.</div>');}finally{btn.disabled=false;btn.textContent='Tạo file';}});
+</script>
+</body>
+</html>
